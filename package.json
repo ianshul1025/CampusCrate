@@ -1,5 +1,24 @@
 {
-  "dependencies": {
-    "cat-me": "^1.0.3"
+  "name": "campuscrate",
+  "version": "1.0.0",
+  "description": "lost and found backend",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "homepage": "https://github.com/ianshul1025/CampusCrate#readme",
+  "bugs": {
+    "url": "https://github.com/ianshul1025/CampusCrate/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ianshul1025/CampusCrate.git"
+  },
+  "license": "ISC",
+  "author": "Anshul Sargoach",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
