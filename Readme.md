@@ -36,7 +36,7 @@ Students frequently lose or find items (ID cards, notebooks, water bottles, powe
 
 ### 🧍‍♂️ 1. **Lost Item Flow (Loser):**
 
-1. Student logs in via college email (Google Auth)
+1. Student logs in via Google / GitHub / LinkedIn Sign-in (Clerk & Google Auth)
 2. Clicks on “I Lost Something”
 3. Fills form:
 
