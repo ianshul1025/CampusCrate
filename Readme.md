@@ -1,4 +1,4 @@
-## 💡 Project: **CampusCrate – Lost & Found System for College**
+## 💡 Project: **CampusCrate – Lost & Found System for University**
 
 ---
 
@@ -159,7 +159,7 @@ Students frequently lose or find items (ID cards, notebooks, water bottles, powe
 ## 🔐 Backend (Express/Node):
 
 * JWT Auth + Google Auth
-* Image uploads (Cloudinary)
+* Image uploads (ImageKit.io or Cloudinary)
 * REST APIs:
 
   * `GET /items`
