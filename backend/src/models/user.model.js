@@ -19,6 +19,30 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "admin"],
       default: "student",
     },
+    clerkId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    branch: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    batch: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    urn: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    avatar: {
+      type: String,
+    },
     blocked: {
       type: Boolean,
       default: false,
@@ -27,4 +51,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+export default User

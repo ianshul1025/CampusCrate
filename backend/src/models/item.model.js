@@ -11,6 +11,7 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
     description: {
       type: String,
@@ -49,4 +50,6 @@ const itemSchema = new mongoose.Schema(
 
 itemSchema.index({ title: "text", description: "text", tags: "text" });
 
-export const Item = mongoose.model("Item", itemSchema);
+const Item = mongoose.model("Item", itemSchema);
+
+export default Item
