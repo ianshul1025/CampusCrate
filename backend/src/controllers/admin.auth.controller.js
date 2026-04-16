@@ -3,8 +3,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
-const ADMIN_UID = process.env.ADMIN_UID || "admin";
-const ADMIN_PWD = process.env.ADMIN_PWD || "admin123";
+const ADMIN_UID = process.env.ADMIN_UID;
+const ADMIN_PWD = process.env.ADMIN_PWD;
 
 export const adminLogin = asyncHandler(async (req, res) => {
   const { adminId, password } = req.body;
