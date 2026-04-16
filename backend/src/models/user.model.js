@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    clerkId: {
       type: String,
-      required: true,
-      trim: true,
+      unique: true,
+      sparse: true,
     },
     email: {
       type: String,
@@ -16,28 +16,47 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "admin"],
-      default: "student",
+      enum: ["user", "admin"],
+      default: "user",
     },
-    clerkId: {
+    profileCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    firstName: {
       type: String,
-      unique: true,
-      sparse: true,
+      trim: true,
+    },
+    middleName: {
+      type: String,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Prefer not to say"],
+    },
+    course: {
+      type: String,
+      trim: true,
     },
     branch: {
       type: String,
-      required: true,
       trim: true,
     },
-    batch: {
+    batchYear: {
       type: String,
-      required: true,
+      trim: true,
+    },
+    semester: {
+      type: String,
       trim: true,
     },
     urn: {
       type: String,
-      required: true,
-      unique: true,
       trim: true,
     },
     avatar: {
@@ -47,6 +66,21 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    blockedAt: {
+      type: Date,
+    },
+    savedItems: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Item",
+    }],
+    blockedUsers: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
+    blockedChats: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Item",
+    }],
   },
   { timestamps: true }
 );

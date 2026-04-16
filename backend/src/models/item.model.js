@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema(
   {
-    type: {
-      type: String,
-      enum: ["lost", "found"],
-      required: true,
-    },
     title: {
       type: String,
       required: true,
@@ -26,22 +21,31 @@ const itemSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
+      default: Date.now,
     },
-    photoUrl: {
+    imageUrl: {
       type: String,
     },
     status: {
       type: String,
+      enum: ["Lost", "Found"],
+      required: true,
+    },
+    state: {
+      type: String,
       enum: ["active", "claimed", "returned"],
       default: "active",
     },
-    postedBy: {
+    reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     claimQuestion: {
       type: String,
+    },
+    returnedAt: {
+      type: Date,
     },
     tags: [String],
   },

@@ -23,7 +23,10 @@ const notificationSchema = new mongoose.Schema(
         "CLAIM_REJECTED",
         "NEW_MESSAGE",
         "ITEM_RETURNED",
-        "ADMIN_WARNING"
+        "ADMIN_WARNING",
+        "CHAT_BLOCKED",
+        "CHAT_UNBLOCKED",
+        "ITEM_EXPIRED"
       ],
       required: true
     },

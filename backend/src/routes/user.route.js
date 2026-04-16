@@ -4,11 +4,13 @@ import {
   getUserProfile,
   updateProfile,
   getAllUsers,
-  blockUser
+  blockUser,
+  toggleBlockChat,
+  reportUser
 } from "../controllers/user.controller.js"
 
 import { protect } from "../middlewares/auth.middleware.js"
-import { isAdmin } from "../middlewares/admin.middleware.js"
+import { verifyAdmin } from "../middlewares/admin.middleware.js"
 
 const router = Router()
 
@@ -21,8 +23,14 @@ router.get("/:id", protect, getUserProfile)
 // Update profile
 router.patch("/me/update", protect, updateProfile)
 
+// Toggle block chat
+router.post("/toggle-block-chat/:itemId", protect, toggleBlockChat)
+
 // Admin routes
-router.get("/", protect, isAdmin, getAllUsers)
-router.patch("/block/:id", protect, isAdmin, blockUser)
+router.get("/", verifyAdmin, getAllUsers)
+router.patch("/block/:id", verifyAdmin, blockUser)
+
+// Report/flag a user (during chat)
+router.post("/report/:userId", protect, reportUser)
 
 export default router

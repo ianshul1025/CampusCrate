@@ -8,6 +8,8 @@ import userRoutes from "./routes/user.route.js"
 import itemRoutes from "./routes/item.route.js"
 import claimRoutes from "./routes/claim.route.js"
 import messageRoutes from "./routes/message.route.js"
+import notificationRoutes from "./routes/notification.route.js"
+import adminRoutes from "./routes/admin.route.js"
 
 const app = express()
 
@@ -36,6 +38,8 @@ app.use("/api/v1/users", userRoutes)
 app.use("/api/v1/items", itemRoutes)
 app.use("/api/v1/claims", claimRoutes)
 app.use("/api/v1/messages", messageRoutes)
+app.use("/api/v1/notifications", notificationRoutes)
+app.use("/api/v1/admin", adminRoutes)
 
 // Health check route
 app.get("/", (req, res) => {
