@@ -54,4 +54,16 @@ app.use((req, res) => {
     })
 })
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error("API Error:", err)
+    const statusCode = err?.statusCode || 500
+    const message = err?.message || "Internal server error"
+    return res.status(statusCode).json({
+        success: false,
+        message,
+        errors: err?.errors || [],
+    })
+})
+
 export default app

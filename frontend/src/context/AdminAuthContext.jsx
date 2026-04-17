@@ -19,6 +19,15 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }, [adminToken]);
 
+  const safeParseResponse = async (res) => {
+    const text = await res.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      throw new Error("Server returned an unexpected response. Please try again.");
+    }
+  };
+
   const loginAdmin = async (adminId, password) => {
     try {
       const res = await fetch(`${API_URL}/admin/login`, {
@@ -26,7 +35,7 @@ export const AdminAuthProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId, password })
       });
-      const data = await res.json();
+      const data = await safeParseResponse(res);
 
       if (!res.ok) throw new Error(data.message || "Failed to login");
 
@@ -66,7 +75,7 @@ export const AdminAuthProvider = ({ children }) => {
       throw new Error("Admin session expired. Please log in again.");
     }
 
-    const data = await res.json();
+    const data = await safeParseResponse(res);
     if (!res.ok) throw new Error(data.message || "Request failed");
 
     return data;
