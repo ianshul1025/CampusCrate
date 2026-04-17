@@ -47,6 +47,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [sortOrder, setSortOrder] = useState("newest");
   const [myClaims, setMyClaims] = useState([]);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -86,6 +87,68 @@ export default function Dashboard() {
     setActiveCategory("all");
     setSearchQuery("");
   };
+
+  const MobileFiltersPanel = () => (
+    <div className="space-y-7">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Filter className="h-5 w-5 text-primary" />
+          <h2 className="font-bold text-lg tracking-tight">Filters</h2>
+        </div>
+        <button
+          className="text-sm text-muted-foreground hover:text-white transition-colors"
+          onClick={resetFilters}
+        >
+          Reset All
+        </button>
+      </div>
+
+      <div>
+        <h3 className="text-[11px] font-bold text-muted-foreground tracking-widest mb-3 uppercase">Search</h3>
+        <Input
+          placeholder="Search items..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="bg-black/20 border-white/10 h-10 rounded-lg"
+        />
+      </div>
+
+      <div>
+        <h3 className="text-[11px] font-bold text-muted-foreground tracking-widest mb-4 uppercase">Categories</h3>
+        <div className="space-y-1 max-h-[32vh] overflow-y-auto pr-1">
+          {CATEGORIES.map(cat => {
+            const Icon = cat.icon;
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-[11px] font-bold text-muted-foreground tracking-widest mb-4 uppercase">Status</h3>
+        <Tabs value={activeStatus} onValueChange={setActiveStatus} className="w-full">
+          <TabsList className="grid grid-cols-3 bg-black/40 border border-white/5 p-1 h-auto rounded-lg">
+            <TabsTrigger value="all" className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-white font-semibold text-xs">All</TabsTrigger>
+            <TabsTrigger value="Lost" className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-white font-semibold text-xs">Lost</TabsTrigger>
+            <TabsTrigger value="Found" className="rounded-md data-[state=active]:bg-green-600 data-[state=active]:text-white font-semibold text-xs">Found</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    </div>
+  );
 
   return (
     <div className="h-screen overflow-hidden bg-background text-foreground flex flex-col font-sans selection:bg-primary/30">
@@ -172,9 +235,21 @@ export default function Dashboard() {
 
               <div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6 mb-6">
                 <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight mb-2">
-                    {searchQuery ? `Results for "${searchQuery}"` : "All Items Feed"}
-                  </h1>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-extrabold tracking-tight mb-2">
+                      {searchQuery ? `Results for "${searchQuery}"` : "All Items Feed"}
+                    </h1>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setMobileFiltersOpen(true)}
+                      className="md:hidden mb-2 border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-lg"
+                    >
+                      <Filter className="h-4 w-4 mr-1.5" />
+                      Filter
+                    </Button>
+                  </div>
                   <p className="text-muted-foreground font-medium">
                     Showing {filteredItems.length} item{filteredItems.length !== 1 ? "s" : ""} found
                   </p>
@@ -397,6 +472,29 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+
+      {mobileFiltersOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <button
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileFiltersOpen(false)}
+            aria-label="Close filters"
+          />
+          <aside className="absolute right-0 top-0 h-full w-[88vw] max-w-sm border-l border-white/10 bg-background p-5 overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Item Feed Filters</h3>
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="h-8 w-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-muted-foreground hover:text-white"
+                aria-label="Close filters"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <MobileFiltersPanel />
+          </aside>
+        </div>
+      )}
     </div>
   );
 }

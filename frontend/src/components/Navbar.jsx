@@ -4,7 +4,7 @@ import { useUser, useClerk } from "@clerk/clerk-react";
 import {
   Home, PlusCircle, Box, User, LogOut, Settings,
   ChevronDown, LayoutGrid, Bell, CheckCheck,
-  ShieldCheck, Package, XCircle, MessageSquare, Bookmark, Trash2
+  ShieldCheck, Package, XCircle, MessageSquare, Bookmark, Trash2, Menu
 } from "lucide-react";
 import { 
   AlertDialog, AlertDialogAction, AlertDialogCancel, 
@@ -36,9 +36,11 @@ export default function Navbar() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifLoading, setNotifLoading] = useState(false);
   const [notificationToRemove, setNotificationToRemove] = useState(null);
+  const [mobileQuickOpen, setMobileQuickOpen] = useState(false);
 
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
+  const mobileQuickRef = useRef(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -48,6 +50,9 @@ export default function Navbar() {
       }
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setNotifOpen(false);
+      }
+      if (mobileQuickRef.current && !mobileQuickRef.current.contains(e.target)) {
+        setMobileQuickOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -396,45 +401,55 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile: notification bell + avatar */}
+          {/* Mobile: quick actions + avatar */}
           <div className="md:hidden flex items-center gap-2">
             <button
-              onClick={openNotifications}
+              onClick={() => setMobileQuickOpen((prev) => !prev)}
               className="relative h-9 w-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10"
-              aria-label="Notifications"
+              aria-label="Open quick actions"
+              ref={mobileQuickRef}
             >
-              <Bell className="h-4 w-4 text-muted-foreground" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => navigate("/saved-items")}
-              className={`relative h-9 w-9 flex items-center justify-center rounded-full border transition-all ${
-                location.pathname === "/saved-items"
-                  ? "bg-primary/20 border-primary/40 text-primary"
-                  : "bg-white/5 border-white/10 text-muted-foreground"
-              }`}
-              aria-label="Saved Items"
-            >
-              <Bookmark className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => navigate("/messages")}
-              className={`relative h-9 w-9 flex items-center justify-center rounded-full border transition-all ${
-                location.pathname === "/messages"
-                  ? "bg-primary/20 border-primary/40 text-primary"
-                  : "bg-white/5 border-white/10 text-muted-foreground"
-              }`}
-              aria-label="Messages"
-            >
-              <MessageSquare className="h-4 w-4" />
-              {unreadMessages > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
-                  {unreadMessages > 9 ? "9+" : unreadMessages}
-                </span>
+              <Menu className="h-4 w-4 text-muted-foreground" />
+              {mobileQuickOpen && (
+                <div className="absolute right-0 top-11 z-50 min-w-[180px] rounded-2xl border border-white/10 bg-card p-2 shadow-2xl">
+                  <button
+                    onClick={() => {
+                      setMobileQuickOpen(false);
+                      openNotifications();
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <span className="flex items-center gap-2"><Bell className="h-4 w-4" /> Notifications</span>
+                    {unreadCount > 0 && (
+                      <span className="h-4 min-w-4 px-1 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileQuickOpen(false);
+                      navigate("/saved-items");
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <Bookmark className="h-4 w-4" /> Saved Items
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileQuickOpen(false);
+                      navigate("/messages");
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <span className="flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Messages</span>
+                    {unreadMessages > 0 && (
+                      <span className="h-4 min-w-4 px-1 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
+                        {unreadMessages > 9 ? "9+" : unreadMessages}
+                      </span>
+                    )}
+                  </button>
+                </div>
               )}
             </button>
             <button

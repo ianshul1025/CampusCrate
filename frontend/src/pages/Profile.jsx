@@ -14,7 +14,7 @@ import { ArrowLeft } from "lucide-react";
 export default function Profile() {
   const { getToken } = useAuth();
   const navigate = useNavigate();
-  const { dbUser, setDbUser } = useDbAuth();
+  const { dbUser, setDbUser, refreshUser } = useDbAuth();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -71,12 +71,28 @@ export default function Profile() {
 
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !data?.success) {
         throw new Error(data.message || "Failed to update profile");
       }
 
+      // Immediate UI sync for all consumers (Navbar/Profile/etc)
       toast.success("Profile updated successfully!");
-      setDbUser(data.data);
+      const updatedUser = data?.data ? { ...dbUser, ...data.data } : { ...dbUser, ...formData };
+      setDbUser(updatedUser);
+      setFormData({
+        firstName: updatedUser.firstName || "",
+        middleName: updatedUser.middleName || "",
+        lastName: updatedUser.lastName || "",
+        gender: updatedUser.gender || "",
+        course: updatedUser.course || "",
+        branch: updatedUser.branch || "",
+        batchYear: updatedUser.batchYear || "",
+        semester: updatedUser.semester || "",
+        urn: updatedUser.urn || "",
+      });
+
+      // Re-fetch persisted record to ensure post-save consistency on refresh/re-login
+      await refreshUser();
     } catch (err) {
       toast.error(err.message || "Something went wrong updating your profile.");
     } finally {

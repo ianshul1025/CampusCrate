@@ -8,7 +8,7 @@ import {
   ShieldCheck, ShieldOff, Eye,
   Search, Package, AlertTriangle,
   UserCheck, UserX, Activity, X,
-  Flag, MessageSquareWarning
+  Flag, MessageSquareWarning, Menu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -385,6 +385,7 @@ export default function AdminDashboard() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [clearedReportsBadge, setClearedReportsBadge] = useState(false);
   const [clearedUsersBadge, setClearedUsersBadge] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     if (section === "reports") setClearedReportsBadge(true);
@@ -498,8 +499,16 @@ export default function AdminDashboard() {
     <div className="h-screen overflow-hidden bg-slate-950 text-white font-sans flex flex-col">
 
       {/* Top Bar */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-white/[0.06] bg-slate-900/80 backdrop-blur-md shrink-0 z-40">
+      <header className="flex items-center justify-between px-3 sm:px-6 py-3 border-b border-white/[0.06] bg-slate-900/80 backdrop-blur-md shrink-0 z-40">
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            className="lg:hidden w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-white/70"
+            aria-label="Open admin navigation"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
           <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center shadow-lg shadow-rose-900/40">
             <ShieldCheck className="w-4 h-4 text-white" />
           </div>
@@ -508,12 +517,12 @@ export default function AdminDashboard() {
             <p className="text-[10px] text-white/30 font-medium">CampusCrate</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button onClick={fetchAll} disabled={loading}
             className="flex items-center gap-1.5 text-xs font-bold text-white/30 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
-          <Link to="/" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-white/20 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+          <Link to="/" target="_blank" rel="noopener noreferrer" className="hidden sm:block text-xs font-bold text-white/20 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
             View App
           </Link>
           <button onClick={handleLogout}
@@ -525,7 +534,7 @@ export default function AdminDashboard() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-52 shrink-0 flex flex-col bg-slate-900/50 border-r border-white/[0.05] overflow-y-auto custom-scrollbar">
+        <aside className="w-52 shrink-0 hidden lg:flex flex-col bg-slate-900/50 border-r border-white/[0.05] overflow-y-auto custom-scrollbar">
           <nav className="flex-1 p-3 space-y-1 pt-4">
             {navItems.map(({ id, label, icon: Icon, badge }) => (
               <button key={id} onClick={() => setSection(id)}
@@ -559,7 +568,7 @@ export default function AdminDashboard() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 space-y-6">
+        <main className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 sm:p-6 space-y-6">
 
           {/* ── DASHBOARD ── */}
           {section === "dashboard" && (
@@ -604,20 +613,22 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
-                  <span>Item Name</span><span>Submitter</span><span>Date</span><span>Status</span><span>State</span><span>Actions</span>
-                </div>
-
-                <div className="divide-y divide-white/[0.04]">
-                  {loading ? (
-                    [...Array(5)].map((_, i) => <div key={i} className="h-16 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
-                  ) : filteredItems.length === 0 ? (
-                    <div className="py-16 text-center text-white/20">
-                      <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                      <p className="font-bold">No items found</p>
+                <div className="overflow-x-auto">
+                  <div className="min-w-[860px]">
+                    <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
+                      <span>Item Name</span><span>Submitter</span><span>Date</span><span>Status</span><span>State</span><span>Actions</span>
                     </div>
-                  ) : filteredItems.map(item => (
-                    <div key={item._id} className={`grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-4 items-center hover:bg-white/[0.02] transition-colors ${item.reportedBy?.blocked ? "bg-red-500/[0.04]" : ""}`}>
+
+                    <div className="divide-y divide-white/[0.04]">
+                      {loading ? (
+                        [...Array(5)].map((_, i) => <div key={i} className="h-16 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
+                      ) : filteredItems.length === 0 ? (
+                        <div className="py-16 text-center text-white/20">
+                          <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                          <p className="font-bold">No items found</p>
+                        </div>
+                      ) : filteredItems.map(item => (
+                        <div key={item._id} className={`grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-4 items-center hover:bg-white/[0.02] transition-colors ${item.reportedBy?.blocked ? "bg-red-500/[0.04]" : ""}`}>
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/5 shrink-0 flex items-center justify-center border border-white/5">
                           {item.imageUrl
@@ -666,8 +677,10 @@ export default function AdminDashboard() {
                           </button>
                         )}
                       </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
                 {filteredItems.length > 0 && (
                   <div className="px-5 py-3 border-t border-white/[0.04] text-xs text-white/20 font-medium">
@@ -695,12 +708,14 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                <div className="overflow-x-auto">
+                  <div className="min-w-[860px]">
                 {/* Table Head */}
-                <div className="grid grid-cols-[40px_1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-3 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
-                  <span>#</span><span>Reported User</span><span>Reported By</span><span>Reason</span><span>Status</span><span>Date & Time</span><span>Action</span>
-                </div>
+                    <div className="grid grid-cols-[40px_1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-3 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
+                      <span>#</span><span>Reported User</span><span>Reported By</span><span>Reason</span><span>Status</span><span>Date & Time</span><span>Action</span>
+                    </div>
 
-                <div className="divide-y divide-white/[0.04]">
+                    <div className="divide-y divide-white/[0.04]">
                   {loading ? (
                     [...Array(5)].map((_, i) => <div key={i} className="h-14 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
                   ) : reports.length === 0 ? (
@@ -762,6 +777,8 @@ export default function AdminDashboard() {
                       </div>
                     );
                   })}
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
@@ -789,12 +806,14 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                <div className="overflow-x-auto">
+                  <div className="min-w-[780px]">
                 {/* Table Head — serial number instead of ID */}
-                <div className="grid grid-cols-[50px_2fr_2.5fr_80px_100px_120px] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
-                  <span>S.No</span><span>Name</span><span>Email</span><span>Role</span><span>Status</span><span>Action</span>
-                </div>
+                    <div className="grid grid-cols-[50px_2fr_2.5fr_80px_100px_120px] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
+                      <span>S.No</span><span>Name</span><span>Email</span><span>Role</span><span>Status</span><span>Action</span>
+                    </div>
 
-                <div className="divide-y divide-white/[0.04]">
+                    <div className="divide-y divide-white/[0.04]">
                   {loading ? (
                     [...Array(8)].map((_, i) => <div key={i} className="h-14 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
                   ) : filteredUsers.length === 0 ? (
@@ -853,12 +872,55 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
           )}
         </main>
       </div>
+
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close admin navigation"
+          />
+          <aside className="absolute left-0 top-0 h-full w-64 bg-slate-900 border-r border-white/[0.08] flex flex-col">
+            <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+              <p className="text-sm font-black text-white">Admin Console</p>
+              <button
+                onClick={() => setMobileNavOpen(false)}
+                className="w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-white/60"
+                aria-label="Close menu"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <nav className="flex-1 p-3 space-y-1">
+              {navItems.map(({ id, label, icon: Icon, badge }) => (
+                <button key={id} onClick={() => { setSection(id); setMobileNavOpen(false); }}
+                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 ${
+                    section === id
+                      ? "bg-rose-600/20 text-rose-400 border border-rose-500/30"
+                      : "text-white/40 hover:text-white hover:bg-white/5 border border-transparent"
+                  }`}>
+                  <span className="flex items-center gap-3">
+                    <Icon className="w-4 h-4 shrink-0" /> {label}
+                  </span>
+                  {badge != null && badge > 0 && (
+                    <span className="text-[10px] font-black bg-rose-500 text-white rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                      {badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </nav>
+          </aside>
+        </div>
+      )}
 
       {/* Item Detail Modal */}
       {selectedItem && (

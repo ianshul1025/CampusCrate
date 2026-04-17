@@ -21,6 +21,22 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const refreshUser = async () => {
+    if (!isSignedIn) return null;
+    const token = await getToken();
+    const res = await fetch(`${API_BASE}/users/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.message || "Failed to refresh user");
+    }
+    setDbUser(data.data);
+    return data.data;
+  };
+
   // Listen for forced block-logout from server
   useEffect(() => {
     const handleBlocked = (e) => {
@@ -96,7 +112,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     syncUser();
-  }, [isClerkLoaded, isSignedIn, clerkUser?.id]);
+  }, [isClerkLoaded, isSignedIn, clerkUser?.id, location.pathname, getToken, navigate]);
   // Note: clerkUser?.id (not the entire object) to avoid infinite re-renders
 
   const updateSavedItems = (newSavedItems) => {
@@ -104,7 +120,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ dbUser, setDbUser, isLoading, updateSavedItems }}>
+    <AuthContext.Provider value={{ dbUser, setDbUser, isLoading, updateSavedItems, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
