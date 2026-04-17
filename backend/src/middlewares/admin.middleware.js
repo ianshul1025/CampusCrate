@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken"
 import ApiError from "../utils/ApiError.js"
 import asyncHandler from "../utils/asyncHandler.js"
 import User from "../models/user.model.js"
+const ADMIN_UID = process.env.ADMIN_UID;
 
 export const verifyAdmin = asyncHandler(async (req, res, next) => {
   // Accept token from Bearer header OR cookie
@@ -23,7 +24,13 @@ export const verifyAdmin = asyncHandler(async (req, res, next) => {
 
     // Superadmin bypass (hardcoded credential flow)
     if (decoded._id === "superadmin") {
-      req.user = { _id: "superadmin", role: "admin", firstName: "Super", lastName: "Admin" };
+      req.user = {
+        _id: "superadmin",
+        role: "admin",
+        firstName: "Super",
+        lastName: "Admin",
+        adminId: decoded.adminId || ADMIN_UID,
+      };
       return next();
     }
 

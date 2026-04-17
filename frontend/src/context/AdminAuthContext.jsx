@@ -41,6 +41,10 @@ export const AdminAuthProvider = ({ children }) => {
     setAdminToken(null);
   };
 
+  const updateAdminToken = (token) => {
+    setAdminToken(token || null);
+  };
+
   const fetchAdmin = async (endpoint, options = {}) => {
     const token = localStorage.getItem("adminToken");
     const headers = {
@@ -69,7 +73,7 @@ export const AdminAuthProvider = ({ children }) => {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ isAdminAuth, adminToken, loginAdmin, logoutAdmin, fetchAdmin }}>
+    <AdminAuthContext.Provider value={{ isAdminAuth, adminToken, loginAdmin, logoutAdmin, fetchAdmin, updateAdminToken }}>
       {children}
     </AdminAuthContext.Provider>
   );

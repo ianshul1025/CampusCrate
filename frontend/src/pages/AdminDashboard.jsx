@@ -5,10 +5,10 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, Users, FileText, LogOut,
   RefreshCw, Trash2, Ban, CheckCircle,
-  ShieldCheck, ShieldOff, Eye,
+  ShieldCheck, ShieldOff, Eye, EyeOff,
   Search, Package, AlertTriangle,
   UserCheck, UserX, Activity, X,
-  Flag, MessageSquareWarning, Menu
+  Flag, MessageSquareWarning, Menu, KeyRound
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -368,7 +368,7 @@ function UserDetailModal({ user, onClose, onBlockUser }) {
 // ── Main AdminDashboard ────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { isAdminAuth, logoutAdmin, fetchAdmin } = useAdminAuth();
+  const { isAdminAuth, logoutAdmin, fetchAdmin, updateAdminToken } = useAdminAuth();
 
   const [section, setSection] = useState("dashboard");
   const [analytics, setAnalytics] = useState(null);
@@ -386,6 +386,19 @@ export default function AdminDashboard() {
   const [clearedReportsBadge, setClearedReportsBadge] = useState(false);
   const [clearedUsersBadge, setClearedUsersBadge] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    newAdminId: "",
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    oldPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
 
   useEffect(() => {
     if (section === "reports") setClearedReportsBadge(true);
@@ -473,6 +486,39 @@ export default function AdminDashboard() {
     navigate("/admin/login");
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    const { newAdminId, oldPassword, newPassword, confirmPassword } = passwordForm;
+    if (!newAdminId || !oldPassword || !newPassword || !confirmPassword) {
+      return toast.error("Please fill all required fields");
+    }
+    if (newPassword !== confirmPassword) {
+      return toast.error("New password and confirm password do not match");
+    }
+    if (newPassword.length < 8) {
+      return toast.error("New password must be at least 8 characters");
+    }
+
+    try {
+      setChangingPassword(true);
+      const response = await fetchAdmin("/admin/change-password", {
+        method: "POST",
+        body: JSON.stringify({ newAdminId, oldPassword, newPassword, confirmPassword }),
+      });
+      if (response?.data?.token) {
+        updateAdminToken(response.data.token);
+      }
+      toast.success("Admin ID and password updated successfully");
+      setPasswordModalOpen(false);
+      setPasswordForm({ newAdminId: "", oldPassword: "", newPassword: "", confirmPassword: "" });
+      setShowPasswords({ oldPassword: false, newPassword: false, confirmPassword: false });
+    } catch (e2) {
+      toast.error(e2.message || "Failed to update admin credentials");
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const filteredItems = items.filter(i =>
     !search ||
     i.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -518,9 +564,20 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <button
+            onClick={() => setPasswordModalOpen(true)}
+            className="flex items-center gap-1.5 text-xs font-bold text-white/30 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            aria-label="Update admin credentials"
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Change Password</span>
+          </button>
           <button onClick={fetchAll} disabled={loading}
-            className="flex items-center gap-1.5 text-xs font-bold text-white/30 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+            className="flex items-center gap-1.5 text-xs font-bold text-white/30 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            aria-label="Refresh admin data"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </button>
           <Link to="/" target="_blank" rel="noopener noreferrer" className="hidden sm:block text-xs font-bold text-white/20 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
             View App
@@ -994,6 +1051,112 @@ export default function AdminDashboard() {
               Yes, Delete Permanently
             </AlertDialogAction>
           </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Change Password */}
+      <AlertDialog
+        open={passwordModalOpen}
+        onOpenChange={(v) => {
+          setPasswordModalOpen(v);
+          if (!v) {
+            setPasswordForm({ newAdminId: "", oldPassword: "", newPassword: "", confirmPassword: "" });
+            setShowPasswords({ oldPassword: false, newPassword: false, confirmPassword: false });
+          }
+        }}
+      >
+        <AlertDialogContent className="bg-slate-900 border-white/10 text-white rounded-2xl max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-lg font-black">
+              <KeyRound className="w-5 h-5 text-rose-400" />
+              Update Admin Credentials
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-white/40 mt-2 text-sm">
+              Change admin ID and password in one step.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <form onSubmit={handleChangePassword} className="space-y-3">
+            <Input
+              type="text"
+              placeholder="New admin ID"
+              value={passwordForm.newAdminId}
+              onChange={(e) => setPasswordForm((prev) => ({ ...prev, newAdminId: e.target.value }))}
+              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20"
+              autoComplete="username"
+              disabled={changingPassword}
+            />
+            <div className="relative">
+            <Input
+              type={showPasswords.oldPassword ? "text" : "password"}
+              placeholder="Old password"
+              value={passwordForm.oldPassword}
+              onChange={(e) => setPasswordForm((prev) => ({ ...prev, oldPassword: e.target.value }))}
+              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 pr-10"
+              autoComplete="current-password"
+              disabled={changingPassword}
+            />
+              <button
+                type="button"
+                onClick={() => setShowPasswords((prev) => ({ ...prev, oldPassword: !prev.oldPassword }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
+                aria-label={showPasswords.oldPassword ? "Hide old password" : "Show old password"}
+              >
+                {showPasswords.oldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            <div className="relative">
+            <Input
+              type={showPasswords.newPassword ? "text" : "password"}
+              placeholder="New password"
+              value={passwordForm.newPassword}
+              onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 pr-10"
+              autoComplete="new-password"
+              disabled={changingPassword}
+            />
+              <button
+                type="button"
+                onClick={() => setShowPasswords((prev) => ({ ...prev, newPassword: !prev.newPassword }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
+                aria-label={showPasswords.newPassword ? "Hide new password" : "Show new password"}
+              >
+                {showPasswords.newPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            <div className="relative">
+            <Input
+              type={showPasswords.confirmPassword ? "text" : "password"}
+              placeholder="Confirm new password"
+              value={passwordForm.confirmPassword}
+              onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 pr-10"
+              autoComplete="new-password"
+              disabled={changingPassword}
+            />
+              <button
+                type="button"
+                onClick={() => setShowPasswords((prev) => ({ ...prev, confirmPassword: !prev.confirmPassword }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
+                aria-label={showPasswords.confirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showPasswords.confirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            <AlertDialogFooter className="gap-3 mt-4">
+              <AlertDialogCancel className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold">
+                Cancel
+              </AlertDialogCancel>
+              <Button
+                type="submit"
+                disabled={changingPassword}
+                className="rounded-xl font-bold bg-rose-600 hover:bg-rose-500 text-white"
+              >
+                {changingPassword ? "Updating..." : "Update Password"}
+              </Button>
+            </AlertDialogFooter>
+          </form>
         </AlertDialogContent>
       </AlertDialog>
     </div>
