@@ -489,7 +489,7 @@ export default function AdminDashboard() {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     const { newAdminId, oldPassword, newPassword, confirmPassword } = passwordForm;
-    if (!newAdminId || !oldPassword || !newPassword || !confirmPassword) {
+    if (!oldPassword || !newPassword || !confirmPassword) {
       return toast.error("Please fill all required fields");
     }
     if (newPassword !== confirmPassword) {
@@ -503,7 +503,7 @@ export default function AdminDashboard() {
       setChangingPassword(true);
       const response = await fetchAdmin("/admin/change-password", {
         method: "POST",
-        body: JSON.stringify({ newAdminId, oldPassword, newPassword, confirmPassword }),
+        body: JSON.stringify({ newAdminId: newAdminId.trim(), oldPassword, newPassword, confirmPassword }),
       });
       if (response?.data?.token) {
         updateAdminToken(response.data.token);
@@ -1079,7 +1079,7 @@ export default function AdminDashboard() {
           <form onSubmit={handleChangePassword} className="space-y-3">
             <Input
               type="text"
-              placeholder="New admin ID"
+              placeholder="New admin ID (optional)"
               value={passwordForm.newAdminId}
               onChange={(e) => setPasswordForm((prev) => ({ ...prev, newAdminId: e.target.value }))}
               className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20"

@@ -57,9 +57,10 @@ export const changeAdminPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword, confirmPassword, newAdminId } = req.body;
   const adminId = req.user?.adminId || ADMIN_UID;
   const normalizedNewAdminId = (newAdminId || "").trim();
+  const effectiveAdminId = normalizedNewAdminId || adminId;
 
-  if (!oldPassword || !newPassword || !confirmPassword || !normalizedNewAdminId) {
-    throw new ApiError(400, "Old password, new admin ID, new password, and confirmation are required");
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    throw new ApiError(400, "Old password, new password, and confirmation are required");
   }
 
   if (newPassword !== confirmPassword) {
@@ -88,8 +89,8 @@ export const changeAdminPassword = asyncHandler(async (req, res) => {
   }
 
   // Prevent collisions when changing admin ID
-  if (normalizedNewAdminId !== adminId) {
-    const existing = await AdminCredential.findOne({ adminId: normalizedNewAdminId });
+  if (effectiveAdminId !== adminId) {
+    const existing = await AdminCredential.findOne({ adminId: effectiveAdminId });
     if (existing) {
       throw new ApiError(409, "This admin ID is already in use");
     }
@@ -98,12 +99,12 @@ export const changeAdminPassword = asyncHandler(async (req, res) => {
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await AdminCredential.findOneAndUpdate(
     { adminId },
-    { $set: { adminId: normalizedNewAdminId, passwordHash } },
+    { $set: { adminId: effectiveAdminId, passwordHash } },
     { upsert: true, new: true }
   );
 
   const refreshedToken = jwt.sign(
-    { _id: "superadmin", role: "admin", adminId: normalizedNewAdminId },
+    { _id: "superadmin", role: "admin", adminId: effectiveAdminId },
     process.env.JWT_SECRET || "fallback_secret",
     { expiresIn: "1d" }
   );
@@ -118,7 +119,7 @@ export const changeAdminPassword = asyncHandler(async (req, res) => {
   return res.status(200).json(
     new ApiResponse(
       200,
-      { adminId: normalizedNewAdminId, token: refreshedToken },
+      { adminId: effectiveAdminId, token: refreshedToken },
       "Admin credentials updated successfully"
     )
   );
