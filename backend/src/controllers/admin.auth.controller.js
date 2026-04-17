@@ -88,12 +88,10 @@ export const changeAdminPassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, "New password must be different from old password");
   }
 
-  // Prevent collisions when changing admin ID
+  // Single-admin system: allow reusing any admin ID freely.
+  // If another stale credential row has the target ID, remove it and continue.
   if (effectiveAdminId !== adminId) {
-    const existing = await AdminCredential.findOne({ adminId: effectiveAdminId });
-    if (existing) {
-      throw new ApiError(409, "This admin ID is already in use");
-    }
+    await AdminCredential.deleteMany({ adminId: effectiveAdminId });
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
