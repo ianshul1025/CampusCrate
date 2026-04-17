@@ -16,8 +16,17 @@ export const adminLogin = asyncHandler(async (req, res) => {
   }
 
   let isValid = false;
+  const hasManagedCredential = await AdminCredential.exists({});
   const storedCredential = await AdminCredential.findOne({ adminId });
-  if (storedCredential) {
+
+  // After first credential change, allow login ONLY via managed DB credentials.
+  if (hasManagedCredential) {
+    if (storedCredential) {
+      isValid = await bcrypt.compare(password, storedCredential.passwordHash);
+    } else {
+      isValid = false;
+    }
+  } else if (storedCredential) {
     isValid = await bcrypt.compare(password, storedCredential.passwordHash);
   } else {
     isValid = adminId === ADMIN_UID && password === ADMIN_PWD;
