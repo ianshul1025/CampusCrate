@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { Send, ArrowLeft, Info, Package, ShieldCheck, MoreVertical, X, Lock, CheckCircle2, Hourglass, XCircle, MessageSquare, Flag, Ban } from "lucide-react";
 import { 
@@ -17,13 +17,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useDbAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
+import { Check, CheckCheck } from "lucide-react";
 
 export default function Messages() {
-  const { itemId } = useParams();
+  const { itemId, otherUserId: urlOtherUserId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { getToken } = useAuth();
   const { dbUser } = useDbAuth();
-  const socket = useSocket();
-  const navigate = useNavigate();
+  const { socket, typingUsers, emitTyping, stopTyping } = useSocket();
   const bottomRef = useRef(null);
 
   const [conversations, setConversations] = useState([]);
@@ -41,27 +43,25 @@ export default function Messages() {
   const [showReportAlert, setShowReportAlert] = useState(false);
   const [reportSending, setReportSending] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
+  const [otherUser, setOtherUser] = useState(null); // Now stores full object { _id, firstName, ... }
+  const [conversationId, setConversationId] = useState(null);
 
   // 1. Fetch all conversations for the sidebar
+  const fetchConversations = useCallback(async () => {
+    try {
+      setConvLoading(true);
+      const res = await fetchWithAuth("/messages", {}, getToken);
+      setConversations(res.data || []);
+    } catch (err) {
+      toast.error("Failed to load conversations.");
+    } finally {
+      setConvLoading(false);
+    }
+  }, [getToken]);
+
   useEffect(() => {
-    console.log("Messages component mounted, itemId:", itemId);
-    const fetchConversations = async () => {
-      try {
-        setConvLoading(true);
-        const res = await fetchWithAuth("/messages", {}, getToken);
-        const data = res.data || [];
-        console.log("Fetched conversations:", data.length);
-        setConversations(data);
-        
-        // Removed auto-select logic for cleaner default state
-      } catch (err) {
-        console.error("Failed to fetch conversations", err);
-      } finally {
-        setConvLoading(false);
-      }
-    };
     fetchConversations();
-  }, [itemId, navigate, getToken]);
+  }, [fetchConversations]);
 
   // 2. Fetch specific chat details when itemId changes
   useEffect(() => {
@@ -98,9 +98,18 @@ export default function Messages() {
 
         // Fetch messages
         try {
-          const msgData = await fetchWithAuth(`/messages/${itemId}`, {}, getToken);
-          setMessages(msgData.data || []);
+          const resData = await fetchWithAuth(`/messages/${itemId}`, {}, getToken);
+          const { messages: msgs, conversationId: cId, otherUser: oUser } = resData.data || {};
+          setMessages(msgs || []);
+          setConversationId(cId);
           
+          if (oUser) {
+              setOtherUser(oUser);
+          } else if (urlOtherUserId) {
+              // Basic fallback
+              setOtherUser({ _id: urlOtherUserId, firstName: "User" });
+          }
+
           // Mark as read
           await fetchWithAuth(`/messages/${itemId}/read`, { method: "PATCH" }, getToken);
           
@@ -121,21 +130,28 @@ export default function Messages() {
     loadChat();
 
     // Socket listeners for this specific chat
-    if (socket) {
-      socket.emit("join_chat", itemId);
+    if (socket && conversationId) {
+      socket.emit("join_chat", conversationId);
 
       socket.on("new_message", (message) => {
-        // 1. Update sidebar latest message & unread count for ALL conversations
+        // 1. Update sidebar latest message & unread count
+        // 1. Update sidebar latest message & unread count
         setConversations(prev => {
-          const exists = prev.find(c => c.item?._id === (message.item?._id || message.item));
-          if (!exists) return prev; 
+          const msgConvId = String(message.conversation?._id || message.conversation);
+          const exists = prev.find(c => String(c._id) === msgConvId);
+          
+          if (!exists) {
+            // New conversation discovered, refresh the list
+            fetchConversations();
+            return prev;
+          } 
           
           return prev.map(c => 
-            c.item?._id === (message.item?._id || message.item)
+            String(c._id) === msgConvId
               ? { 
                   ...c, 
                   latestMessage: message, 
-                  unreadCount: (message.item === itemId || message.item?._id === itemId) ? 0 : (c.unreadCount + 1) 
+                  unreadCount: (msgConvId === String(conversationId)) ? 0 : (c.unreadCount + 1) 
                 } 
               : c
           ).sort((a, b) => {
@@ -145,11 +161,12 @@ export default function Messages() {
           });
         });
 
-        // 2. Only append to message list if it's for the currently active chat
-        const msgItemId = message.item?._id || message.item;
-        if (msgItemId !== itemId) return;
+        // 2. Append to message list if active
+        const msgConvId = String(message.conversation?._id || message.conversation);
+        const currentConvId = conversationId ? String(conversationId) : null;
+        if (msgConvId !== currentConvId) return;
         
-        // Ignore my own messages
+        // Ignore my own messages (already added optimistically)
         if (message.sender?._id === dbUser?._id || message.sender?._id === dbUser?.mongoId) return;
 
         setMessages(prev => {
@@ -157,18 +174,46 @@ export default function Messages() {
           return [...prev, message];
         });
 
-        // 3. Mark as read immediately
-        fetchWithAuth(`/messages/${itemId}/read`, { method: "PATCH" }, getToken).catch(() => {});
+        // 3. Emit delivered status
+        socket.emit("message_delivered", { 
+            messageId: message._id, 
+            conversationId: conversationId, 
+            senderId: message.sender?._id || message.sender 
+        });
+
+        // 4. Mark as read immediately if window is active
+        if (document.visibilityState === "visible") {
+            socket.emit("message_read", { 
+                messageId: message._id, 
+                conversationId: conversationId, 
+                senderId: message.sender?._id || message.sender 
+            });
+            fetchWithAuth(`/messages/${itemId}/read`, { method: "PATCH" }, getToken).catch(() => {});
+        }
+      });
+
+      socket.on("message_status", ({ messageId, conversationId: statusConvId, status }) => {
+          // Update message list if it's the active chat
+          if (statusConvId === conversationId) {
+            setMessages(prev => prev.map(m => 
+                m._id === messageId ? { ...m, status } : m
+            ));
+          }
+          // Always update sidebar if it's the latest message
+          setConversations(prev => prev.map(c => 
+              c.latestMessage?._id === messageId ? { ...c, latestMessage: { ...c.latestMessage, status } } : c
+          ));
       });
     }
 
     return () => {
       if (socket) {
         socket.off("new_message");
-        socket.emit("leave_chat", itemId);
+        socket.off("message_status");
+        if (conversationId) socket.emit("leave_chat", conversationId);
       }
     };
-  }, [itemId, socket]);
+  }, [itemId, urlOtherUserId, socket, conversationId]);
 
   // Auto-scroll
   useEffect(() => {
@@ -185,6 +230,7 @@ export default function Messages() {
       message: newMessage,
       sender: { _id: dbUser?._id, firstName: dbUser?.firstName, avatar: dbUser?.avatar },
       createdAt: new Date().toISOString(),
+      status: "sent",
       isMe: true
     };
     setMessages(prev => [...prev, optimistic]);
@@ -200,7 +246,7 @@ export default function Messages() {
       
       // Update sidebar preview
       setConversations(prev => prev.map(c => 
-        c.item._id === itemId ? { ...c, latestMessage: res.data } : c
+        c._id === conversationId ? { ...c, latestMessage: res.data } : c
       ));
     } catch (err) {
       toast.error(err.message || "Failed to send message.");
@@ -374,10 +420,11 @@ export default function Messages() {
             ) : (
               filteredConversations && filteredConversations.map((conv) => (
                 <button
-                  key={conv.item?._id}
-                  onClick={() => conv.item?._id && navigate(`/messages/${conv.item._id}`)}
+                  key={conv._id}
+                  onClick={() => conv.otherUser?._id && navigate(`/messages/${conv.item?._id}/${conv.otherUser._id}`)}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group relative border ${
-                    itemId === conv.item?._id
+                    // Highlight if this is the active user
+                    location.pathname.includes(conv.otherUser?._id)
                       ? "bg-primary/20 border-primary/30"
                       : "hover:bg-white/5 border-transparent"
                   }`}
@@ -478,14 +525,26 @@ export default function Messages() {
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
                   <div className="h-11 w-11 rounded-xl border border-white/10 overflow-hidden bg-white/5 shrink-0">
-                    {item.imageUrl ? <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /> : <Package className="h-5 w-5 text-white/20" />}
+                    <Avatar className="h-full w-full rounded-none">
+                      <AvatarImage src={otherUser?.avatar} />
+                      <AvatarFallback className="bg-primary/20 text-primary text-xs font-black">
+                        {otherUser?.firstName?.[0]?.toUpperCase() || "?"}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-white truncate">{item.title}</p>
+                      <p className="font-bold text-lg text-white truncate">
+                        {otherUser?.firstName ? `${otherUser.firstName} ${otherUser.lastName || ""}` : "User"}
+                      </p>
                       {claimStatus === "approved" && <Badge className="text-[9px] font-bold text-green-400 border-green-400/30 bg-green-400/10 px-1.5 py-0.5">APPROVED</Badge>}
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">#{item._id?.slice(-8).toUpperCase()} • {item.location}</p>
+                    <div className="flex items-center gap-1.5">
+                      <Package className="h-3 w-3 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground truncate font-medium">
+                        {item.title}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Link to={`/item/${itemId}`}>
@@ -568,8 +627,15 @@ export default function Messages() {
                           </AvatarFallback>
                         </Avatar>
                         <div className={`flex flex-col max-w-[70%] ${mine ? "items-end" : "items-start"}`}>
-                          <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${mine ? "bg-primary text-white rounded-br-none shadow-lg shadow-primary/20" : "bg-white/10 text-white rounded-bl-none"}`}>
+                          <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed relative ${mine ? "bg-primary text-white rounded-br-none shadow-lg shadow-primary/20" : "bg-white/10 text-white rounded-bl-none"}`}>
                             {msg.message}
+                            {mine && msg._id && !msg._id.startsWith("temp-") && (
+                                <div className="absolute bottom-1 right-2 flex items-center">
+                                    {msg.status === "sent" && <Check className="h-3 w-3 text-white/50" />}
+                                    {msg.status === "delivered" && <CheckCheck className="h-3 w-3 text-white/50" />}
+                                    {msg.status === "read" && <CheckCheck className="h-3 w-3 text-blue-300" />}
+                                </div>
+                            )}
                           </div>
                           <span className="text-[9px] text-muted-foreground mt-1 px-1">
                             {formatTime(msg.createdAt)}
@@ -580,6 +646,20 @@ export default function Messages() {
                   })
                 )}
                 <div ref={bottomRef} />
+                
+                {/* Typing Indicator */}
+                {conversationId && typingUsers.get(conversationId)?.size > 0 && (
+                  <div className="flex items-center gap-2 px-6 py-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex gap-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-medium italic">
+                      Someone is typing...
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Input */}
@@ -593,12 +673,22 @@ export default function Messages() {
                 )}
                 <Input
                   value={newMessage}
-                  onChange={e => setNewMessage(e.target.value)}
+                  onChange={e => {
+                      setNewMessage(e.target.value);
+                      emitTyping(conversationId, otherUser?._id);
+                  }}
+                  onBlur={() => stopTyping(conversationId, otherUser?._id)}
                   placeholder="Type a message..."
                   className="flex-1 bg-white/5 border-white/10 h-11 rounded-xl text-sm"
                   disabled={sending || item?.state === "returned"}
                 />
-                <Button type="submit" size="icon" className="h-11 w-11 rounded-xl shrink-0 bg-primary hover:bg-primary/90" disabled={sending || !newMessage.trim() || item?.state === "returned"}>
+                <Button 
+                    type="submit" 
+                    size="icon" 
+                    className="h-11 w-11 rounded-xl shrink-0 bg-primary hover:bg-primary/90" 
+                    disabled={sending || !newMessage.trim() || item?.state === "returned"}
+                    onClick={() => stopTyping(conversationId, otherUser?._id)}
+                >
                   <Send className="h-5 w-5" />
                 </Button>
               </form>

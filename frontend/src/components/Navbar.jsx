@@ -19,6 +19,7 @@ import { fetchWithAuth } from "../hooks/useApi";
 import { useAuth } from "@clerk/clerk-react";
 import { useSocket } from "../context/SocketContext";
 import { toast } from "sonner";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 
 export default function Navbar() {
   const { user } = useUser();
@@ -27,7 +28,7 @@ export default function Navbar() {
   const { dbUser } = useDbAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const socket = useSocket();
+  const { socket } = useSocket();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -37,6 +38,16 @@ export default function Navbar() {
   const [notifLoading, setNotifLoading] = useState(false);
   const [notificationToRemove, setNotificationToRemove] = useState(null);
   const [mobileQuickOpen, setMobileQuickOpen] = useState(false);
+  const { permission, subscribeUser } = usePushNotifications();
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
+
+  // Show push prompt after 5 seconds if not granted
+  useEffect(() => {
+    if (permission === "default" && dbUser) {
+      const timer = setTimeout(() => setShowPushPrompt(true), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [permission, dbUser]);
 
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
@@ -59,7 +70,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Fetch notification count on mount (and every 30s)
+  // Fetch notification count on mount
   useEffect(() => {
     if (!dbUser) return;
     const loadCount = async () => {
@@ -80,27 +91,31 @@ export default function Navbar() {
     };
     loadUnreadCount();
 
-    const interval = setInterval(() => {
-        loadCount();
-        loadUnreadCount();
-    }, 30000);
-
-    // Socket real-time updates for unread messages
+    // Socket real-time updates
     if (socket) {
       socket.emit("join_user", dbUser._id);
       
       socket.on("new_message", (message) => {
           // Re-fetch the global unread count to ensure "unique conversation" logic
-          if (message.receiver === dbUser?._id) {
+          if (message.receiver === dbUser?._id || message.receiver?._id === dbUser?._id) {
               loadUnreadCount();
           }
+      });
+
+      socket.on("new_notification", (notif) => {
+          setNotifications(prev => [notif, ...prev]);
+          setUnreadCount(prev => prev + 1);
+          toast.info(notif.title, {
+              description: notif.message,
+              onClick: () => navigate(notif.item?._id ? `/item/${notif.item._id}` : "/dashboard")
+          });
       });
     }
 
     return () => {
-        clearInterval(interval);
         if (socket) {
             socket.off("new_message");
+            socket.off("new_notification");
         }
     };
   }, [dbUser, socket]);
@@ -487,6 +502,33 @@ export default function Navbar() {
               className="rounded-xl px-8 h-12 bg-red-600 hover:bg-red-500 text-white font-bold text-base border-0"
             >
               Confirm Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={showPushPrompt} onOpenChange={setShowPushPrompt}>
+        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-8 max-w-md mx-auto backdrop-blur-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold flex items-center gap-3">
+              <Bell className="h-6 w-6 text-primary" />
+              Enable Push Notifications?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground mt-2">
+              Stay updated on your claims and messages even when you're not using the app.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-3 mt-6">
+            <AlertDialogCancel className="rounded-xl px-4 h-10 border-white/10 bg-white/5 hover:bg-white/10 text-white">
+              Later
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                subscribeUser();
+                setShowPushPrompt(false);
+              }}
+              className="rounded-xl px-4 h-10 bg-primary hover:bg-primary/90 text-white border-0"
+            >
+              Enable Now
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

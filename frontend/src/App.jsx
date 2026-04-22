@@ -16,6 +16,7 @@ import BlockedMessages from "./pages/BlockedMessages"
 import MyPosts from "./pages/MyPosts"
 import EditItem from "./pages/EditItem"
 import SavedItems from "./pages/SavedItems"
+import NotFound from "./pages/NotFound"
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "./context/AuthContext"
 import { SocketProvider } from "./context/SocketContext"
@@ -26,6 +27,8 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key")
 }
+
+import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
   return (
@@ -45,97 +48,105 @@ function App() {
           <Route 
             path="/complete-profile" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <ProfileSetup />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
           
           <Route 
             path="/dashboard" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <Dashboard />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/profile" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <Profile />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/report" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <ReportItem />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/item/:id" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <ItemDetail />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/messages" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <Messages />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/messages/:itemId" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <Messages />
-              </SignedIn>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/messages/:itemId/:otherUserId" 
+            element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/blocked-messages" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <BlockedMessages />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/my-posts" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <MyPosts />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/saved-items" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <SavedItems />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/edit-item/:id" 
             element={
-              <SignedIn>
+              <ProtectedRoute>
                 <EditItem />
-              </SignedIn>
+              </ProtectedRoute>
             } 
           />
 
@@ -143,8 +154,8 @@ function App() {
           <Route path="/admin/login" element={<AdminAuthProvider><AdminLogin /></AdminAuthProvider>} />
           <Route path="/admin/dashboard" element={<AdminAuthProvider><AdminDashboard /></AdminAuthProvider>} />
 
-          {/* Catch-all redirect */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Catch-all 404 */}
+          <Route path="*" element={<NotFound />} />
           
             </Routes>
           </SocketProvider>

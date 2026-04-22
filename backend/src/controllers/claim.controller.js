@@ -1,10 +1,14 @@
 import Claim from "../models/claim.model.js"
 import Item from "../models/item.model.js"
 import { Notification } from "../models/notification.model.js"
+import User from "../models/user.model.js"
+import { Conversation } from "../models/conversation.model.js"
 
 import ApiResponse from "../utils/ApiResponse.js"
 import ApiError from "../utils/ApiError.js"
 import asyncHandler from "../utils/asyncHandler.js"
+import { emitToUser, isUserOnline } from "../socket.js"
+import { sendPushToUser } from "../services/webpush.service.js"
 
 
 
@@ -66,8 +70,8 @@ export const createClaim = asyncHandler(async (req, res) => {
         message: answer
     })
 
-    // Notify item poster
-    await Notification.create({
+    // Notify item poster via socket + push
+    const claimedNotif = await Notification.create({
         recipient: item.reportedBy._id,
         sender: req.user._id,
         type: "ITEM_CLAIMED",
@@ -76,6 +80,18 @@ export const createClaim = asyncHandler(async (req, res) => {
         item: item._id,
         claim: claim._id
     })
+    await claimedNotif.populate("sender", "firstName lastName avatar")
+    await claimedNotif.populate("item", "title status imageUrl")
+    emitToUser(item.reportedBy._id.toString(), "new_notification", claimedNotif.toObject())
+
+    if (!isUserOnline(item.reportedBy._id.toString())) {
+        sendPushToUser(item.reportedBy._id.toString(), {
+            title: "New claim received",
+            body: `Someone submitted a claim for "${item.title}".`,
+            icon: "/icon-192x192.png",
+            data: { url: `/item/${item._id}` }
+        }).catch(console.error)
+    }
 
     return res.status(201).json(
         new ApiResponse(201, claim, "Claim submitted successfully")
@@ -176,27 +192,67 @@ export const verifyClaim = asyncHandler(async (req, res) => {
     claim.status = status
     await claim.save()
 
-    // Notify the claimant
+    // If approved, automatically reject all other pending claims for this item
     if (status === "approved") {
-        await Notification.create({
-            recipient: claim.claimantId,
-            sender: req.user._id,
+        await Claim.updateMany(
+            { 
+                itemId: claim.itemId._id, 
+                _id: { $ne: claimId },
+                status: "pending"
+            },
+            { $set: { status: "rejected" } }
+        )
+
+        // Create or find a conversation for this item + pair
+        const posterId = claim.itemId.reportedBy
+        const claimantId = claim.claimantId
+        
+        let conversation = await Conversation.findOne({
+            participants: { $all: [posterId, claimantId] }
+        })
+
+        if (!conversation) {
+            conversation = await Conversation.create({
+                item: claim.itemId._id,
+                participants: [posterId, claimantId]
+            })
+        } else {
+            conversation.item = claim.itemId._id
+            await conversation.save()
+        }
+    }
+
+    // Notify the claimant via socket + push
+    const notifData = status === "approved"
+        ? {
             type: "CLAIM_APPROVED",
             title: "Claim Accepted 🎉",
-            message: `Your claim for "${claim.itemId.title}" was accepted. You can now message the poster.`,
-            item: claim.itemId._id,
-            claim: claim._id
-        })
-    } else {
-        await Notification.create({
-            recipient: claim.claimantId,
-            sender: req.user._id,
+            message: `Your claim for "${claim.itemId.title}" was accepted. You can now message the poster.`
+          }
+        : {
             type: "CLAIM_REJECTED",
             title: "Claim Not Accepted",
-            message: `Your claim for "${claim.itemId.title}" was not accepted by the poster.`,
-            item: claim.itemId._id,
-            claim: claim._id
-        })
+            message: `Your claim for "${claim.itemId.title}" was not accepted by the poster.`
+          }
+
+    const verifyNotif = await Notification.create({
+        recipient: claim.claimantId,
+        sender: req.user._id,
+        ...notifData,
+        item: claim.itemId._id,
+        claim: claim._id
+    })
+    await verifyNotif.populate("sender", "firstName lastName avatar")
+    await verifyNotif.populate("item", "title status imageUrl")
+    emitToUser(claim.claimantId.toString(), "new_notification", verifyNotif.toObject())
+
+    if (!isUserOnline(claim.claimantId.toString())) {
+        sendPushToUser(claim.claimantId.toString(), {
+            title: notifData.title,
+            body: notifData.message,
+            icon: "/icon-192x192.png",
+            data: { url: `/item/${claim.itemId._id}` }
+        }).catch(console.error)
     }
 
     return res.status(200).json(

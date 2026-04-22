@@ -202,3 +202,16 @@ export const reportUser = asyncHandler(async (req, res) => {
         new ApiResponse(201, report, "Report submitted successfully to Admin.")
     );
 });
+
+// Subscribe to push notifications
+export const subscribeToPush = asyncHandler(async (req, res) => {
+    const { subscription } = req.body;
+    if (!subscription) throw new ApiError(400, "Subscription is required");
+
+    const { registerPushSubscription } = await import("../services/webpush.service.js");
+    await registerPushSubscription(req.user._id, subscription);
+
+    return res.status(200).json(
+        new ApiResponse(200, null, "Subscribed to push notifications")
+    );
+});

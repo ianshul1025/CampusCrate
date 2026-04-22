@@ -33,4 +33,9 @@ router.patch("/block/:id", verifyAdmin, blockUser)
 // Report/flag a user (during chat)
 router.post("/report/:userId", protect, reportUser)
 
+// Push Notifications
+router.post("/subscribe", protect, (req, res, next) => {
+    import("../controllers/user.controller.js").then(ctrl => ctrl.subscribeToPush(req, res, next))
+})
+
 export default router

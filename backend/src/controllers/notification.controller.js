@@ -3,6 +3,8 @@ import { Notification } from "../models/notification.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import ApiError from "../utils/ApiError.js"
 import asyncHandler from "../utils/asyncHandler.js"
+import { emitToUser } from "../socket.js"
+import { registerPushSubscription, removePushSubscription } from "../services/webpush.service.js"
 
 
 
@@ -100,4 +102,47 @@ export const deleteAllNotifications = asyncHandler(async (req, res) => {
         new ApiResponse(200, null, "All notifications deleted")
     )
 
+})
+
+/*
+Register a Web Push subscription – POST /notifications/push/subscribe
+*/
+export const subscribePush = asyncHandler(async (req, res) => {
+    const { subscription } = req.body
+
+    if (!subscription?.endpoint || !subscription?.keys) {
+        throw new ApiError(400, "Invalid push subscription object")
+    }
+
+    await registerPushSubscription(req.user._id, subscription)
+
+    return res.status(200).json(
+        new ApiResponse(200, null, "Push subscription registered")
+    )
+})
+
+/*
+Remove a Web Push subscription – POST /notifications/push/unsubscribe
+*/
+export const unsubscribePush = asyncHandler(async (req, res) => {
+    const { endpoint } = req.body
+
+    if (!endpoint) {
+        throw new ApiError(400, "Endpoint is required")
+    }
+
+    await removePushSubscription(req.user._id, endpoint)
+
+    return res.status(200).json(
+        new ApiResponse(200, null, "Push subscription removed")
+    )
+})
+
+/*
+Get VAPID public key – GET /notifications/push/vapid-key
+*/
+export const getVapidPublicKey = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(200, { publicKey: process.env.VAPID_PUBLIC_KEY }, "VAPID public key")
+    )
 })

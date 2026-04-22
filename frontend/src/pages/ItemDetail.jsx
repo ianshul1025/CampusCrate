@@ -366,7 +366,7 @@ export default function ItemDetail() {
                           <Button
                             size="sm"
                             className="h-7 px-2.5 text-[10px] rounded-lg bg-primary hover:bg-primary/90 font-bold gap-1.5"
-                            onClick={() => navigate(`/messages/${id}`)}
+                            onClick={() => navigate(`/messages/${id}/${claimant?._id || claim.claimantId}`)}
                           >
                             <MessageSquare className="h-3 w-3" />
                             Chat
@@ -459,7 +459,7 @@ export default function ItemDetail() {
           </div>
           <Button
             className="w-full rounded-xl h-11 font-bold bg-green-600 hover:bg-green-500"
-            onClick={() => navigate(`/messages/${id}`)}
+            onClick={() => navigate(`/messages/${id}/${item.reportedBy._id || item.reportedBy}`)}
           >
             <MessageSquare className="h-4 w-4 mr-2" />
             Message {chatPartnerLabel}

@@ -234,27 +234,27 @@ export default function LandingPage() {
 
             {/* Live Stats */}
             {stats.total > 0 && (
-              <div className="flex gap-8 mt-10 text-center">
-                <div>
-                  <p className="text-3xl font-extrabold text-white"><AnimatedCounter end={stats.total} /></p>
-                  <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Total Items</p>
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:gap-12 mt-10 text-center px-4">
+                <div className="min-w-[80px]">
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white"><AnimatedCounter end={stats.total} /></p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Total Items</p>
                 </div>
-                <div className="w-px bg-white/10" />
-                <div>
-                  <p className="text-3xl font-extrabold text-green-400"><AnimatedCounter end={stats.found} /></p>
-                  <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Found</p>
+                <div className="hidden sm:block w-px h-8 bg-white/10" />
+                <div className="min-w-[80px]">
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-green-400"><AnimatedCounter end={stats.found} /></p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Found</p>
                 </div>
-                <div className="w-px bg-white/10" />
-                <div>
-                  <p className="text-3xl font-extrabold text-red-400"><AnimatedCounter end={stats.lost} /></p>
-                  <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Lost</p>
+                <div className="hidden sm:block w-px h-8 bg-white/10" />
+                <div className="min-w-[80px]">
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-red-400"><AnimatedCounter end={stats.lost} /></p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Lost</p>
                 </div>
                 {stats.returned >= 0 && (
                   <>
-                    <div className="w-px bg-white/10" />
-                    <div>
-                      <p className="text-3xl font-extrabold text-blue-400"><AnimatedCounter end={stats.returned} /></p>
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Returned</p>
+                    <div className="hidden sm:block w-px h-8 bg-white/10" />
+                    <div className="min-w-[80px]">
+                      <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-blue-400"><AnimatedCounter end={stats.returned} /></p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Returned</p>
                     </div>
                   </>
                 )}
