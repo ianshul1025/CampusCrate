@@ -1,0 +1,29 @@
+/*
+Total unread count for navbar – GET /messages/unread/count
+Counts how many unique conversations have unread messages for the user.
+*/
+export const getUnreadCount = asyncHandler(async (req, res) => {
+    const userId = req.user._id
+
+    // Find all conversations where the user is a participant
+    const conversations = await Conversation.find({
+        participants: userId
+    })
+
+    let unreadConversationsCount = 0
+
+    for (const conv of conversations) {
+        const count = await Message.countDocuments({
+            conversation: conv._id,
+            receiver: userId,
+            status: { $in: ["sent", "delivered"] }
+        })
+        if (count > 0) {
+            unreadConversationsCount++
+        }
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, { unreadCount: unreadConversationsCount }, "Unread count fetched")
+    )
+})
