@@ -25,7 +25,7 @@ export default function Messages() {
   const location = useLocation();
   const { getToken } = useAuth();
   const { dbUser } = useDbAuth();
-  const { socket, typingUsers, emitTyping, stopTyping } = useSocket();
+  const { socket, typingUsers, emitTyping, stopTyping, onlineUsers } = useSocket();
   const bottomRef = useRef(null);
 
   const [conversations, setConversations] = useState([]);
@@ -437,6 +437,9 @@ export default function Messages() {
                         {conv.otherUser?.firstName?.[0]?.toUpperCase() || "?"}
                       </AvatarFallback>
                     </Avatar>
+                    {onlineUsers.has(String(conv.otherUser?._id)) && (
+                      <div className="absolute top-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background z-10" />
+                    )}
                     {/* Tiny Item Thumbnail overlay */}
                     <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-card border border-white/10 overflow-hidden shadow-md flex items-center justify-center p-0.5">
                       {conv.item?.imageUrl ? (
@@ -537,7 +540,12 @@ export default function Messages() {
                       <p className="font-bold text-lg text-white truncate">
                         {otherUser?.firstName ? `${otherUser.firstName} ${otherUser.lastName || ""}` : "User"}
                       </p>
-                      {claimStatus === "approved" && <Badge className="text-[9px] font-bold text-green-400 border-green-400/30 bg-green-400/10 px-1.5 py-0.5">APPROVED</Badge>}
+                      {onlineUsers.has(String(otherUser?._id)) ? (
+                        <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[9px] px-1.5 py-0">Online</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground border-white/10 text-[9px] px-1.5 py-0">Offline</Badge>
+                      )}
+                      {claimStatus === "approved" && <Badge className="text-[9px] font-bold text-green-400 border-green-400/30 bg-green-400/10 px-1.5 py-0.5 ml-auto">APPROVED</Badge>}
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Package className="h-3 w-3 text-muted-foreground" />
