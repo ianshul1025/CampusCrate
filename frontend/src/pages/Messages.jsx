@@ -44,7 +44,11 @@ export default function Messages() {
   const [reportSending, setReportSending] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
   const [otherUser, setOtherUser] = useState(null); // Now stores full object { _id, firstName, ... }
-  const [conversationId, setConversationId] = useState(null);
+  const [conversationId, setConversationId] = useState(null);  const activeConvRef = useRef(null);
+
+  useEffect(() => {
+    activeConvRef.current = conversationId;
+  }, [conversationId]);
 
   // 1. Fetch all conversations for the sidebar
   const fetchConversations = useCallback(async () => {
@@ -69,6 +73,7 @@ export default function Messages() {
       setItem(null);
       setMessages([]);
       setLoading(false);
+      setConversationId(null);
       return;
     }
 
@@ -110,7 +115,6 @@ export default function Messages() {
           if (oUser) {
               setOtherUser(oUser);
           } else if (urlOtherUserId) {
-              // Basic fallback
               setOtherUser({ _id: urlOtherUserId, firstName: "User" });
           }
 
@@ -118,7 +122,7 @@ export default function Messages() {
           const readUrl = urlOtherUserId 
             ? `/messages/${itemId}/read?otherUserId=${urlOtherUserId}` 
             : `/messages/${itemId}/read`;
-          await fetchWithAuth(readUrl, { method: "PATCH" }, getToken);
+          await fetchWithAuth(readUrl, { method: "PATCH" }, getToken).catch(() => {});
           
           // Update local conversation list unread count
           setConversations(prev => prev.map(c => 
@@ -135,95 +139,116 @@ export default function Messages() {
       }
     };
     loadChat();
+  }, [itemId, urlOtherUserId, getToken]);
 
-    // Socket listeners for this specific chat
-    if (socket && conversationId) {
-      socket.emit("join_chat", conversationId);
+  // 3. Stable Socket Listeners
+  useEffect(() => {
+    if (!socket || !dbUser) return;
 
-      socket.on("new_message", (message) => {
-        // 1. Update sidebar latest message & unread count
-        // 1. Update sidebar latest message & unread count
-        setConversations(prev => {
-          const msgConvId = String(message.conversation?._id || message.conversation);
-          const exists = prev.find(c => String(c._id) === msgConvId);
-          
-          if (!exists) {
-            // New conversation discovered, refresh the list
-            fetchConversations();
-            return prev;
-          } 
-          
-          return prev.map(c => 
-            String(c._id) === msgConvId
-              ? { 
-                  ...c, 
-                  latestMessage: message, 
-                  unreadCount: (msgConvId === String(conversationId)) ? 0 : (c.unreadCount + 1) 
-                } 
-              : c
-          ).sort((a, b) => {
-            const dateA = new Date(a.latestMessage?.createdAt || 0);
-            const dateB = new Date(b.latestMessage?.createdAt || 0);
-            return dateB - dateA;
-          });
-        });
-
-        // 2. Append to message list if active
-        const msgConvId = String(message.conversation?._id || message.conversation);
-        const currentConvId = conversationId ? String(conversationId) : null;
-        if (msgConvId !== currentConvId) return;
+    const handleNewMessage = (message) => {
+      const msgConvId = String(message.conversation?._id || message.conversation);
+      
+      // Update sidebar for ALL incoming messages
+      setConversations(prev => {
+        const exists = prev.find(c => String(c._id) === msgConvId);
         
-        // Ignore my own messages (already added optimistically)
-        if (message.sender?._id === dbUser?._id || message.sender?._id === dbUser?.mongoId) return;
+        if (!exists) {
+          fetchConversations(); // Refresh if it's a new conversation
+          return prev;
+        } 
+
+        const isCurrentlyOpen = msgConvId === String(activeConvRef.current);
+        
+        return prev.map(c => 
+          String(c._id) === msgConvId
+            ? { 
+                ...c, 
+                latestMessage: message, 
+                unreadCount: isCurrentlyOpen ? 0 : (c.unreadCount + 1) 
+              } 
+            : c
+        ).sort((a, b) => {
+          const dateA = new Date(a.latestMessage?.createdAt || 0);
+          const dateB = new Date(b.latestMessage?.createdAt || 0);
+          return dateB - dateA;
+        });
+      });
+
+      // Update active chat messages
+      if (msgConvId === String(activeConvRef.current)) {
+        // Ignore my own messages if they were already added (handled by message_sent/REST)
+        const senderId = String(message.sender?._id || message.sender);
+        const myId = String(dbUser._id || dbUser.mongoId);
+        if (senderId === myId) return;
 
         setMessages(prev => {
           if (prev.find(m => m._id === message._id)) return prev;
           return [...prev, message];
         });
 
-        // 3. Emit delivered status
+        // Emit delivered & read status if active
         socket.emit("message_delivered", { 
-            messageId: message._id, 
-            conversationId: conversationId, 
-            senderId: message.sender?._id || message.sender 
+          messageId: message._id, 
+          senderId: message.sender?._id || message.sender 
         });
 
-        // 4. Mark as read immediately if window is active
         if (document.visibilityState === "visible") {
-            socket.emit("message_read", { 
-                messageId: message._id, 
-                conversationId: conversationId, 
-                senderId: message.sender?._id || message.sender 
-            });
-            const readUrl = urlOtherUserId 
-                ? `/messages/${itemId}/read?otherUserId=${urlOtherUserId}` 
-                : `/messages/${itemId}/read`;
-            fetchWithAuth(readUrl, { method: "PATCH" }, getToken).catch(() => {});
+          socket.emit("message_read", { 
+            messageId: message._id, 
+            senderId: message.sender?._id || message.sender 
+          });
         }
-      });
-
-      socket.on("message_status", ({ messageId, conversationId: statusConvId, status }) => {
-          // Update message list if it's the active chat
-          if (statusConvId === conversationId) {
-            setMessages(prev => prev.map(m => 
-                m._id === messageId ? { ...m, status } : m
-            ));
-          }
-          // Always update sidebar if it's the latest message
-          setConversations(prev => prev.map(c => 
-              c.latestMessage?._id === messageId ? { ...c, latestMessage: { ...c.latestMessage, status } } : c
-          ));
-      });
-    }
-
-    return () => {
-      if (socket) {
-        socket.off("new_message");
-        socket.off("message_status");
-        if (conversationId) socket.emit("leave_chat", conversationId);
       }
     };
-  }, [itemId, urlOtherUserId, socket, conversationId]);
+
+    const handleMessageSent = (message) => {
+        const msgConvId = String(message.conversation?._id || message.conversation);
+        if (msgConvId === String(activeConvRef.current)) {
+            setMessages(prev => {
+                const existingIdx = prev.findIndex(m => m._id === message._id || (m._id.startsWith("temp-") && m.message === message.message));
+                if (existingIdx > -1) {
+                    const next = [...prev];
+                    next[existingIdx] = { ...message, isMe: true };
+                    return next;
+                }
+                return [...prev, { ...message, isMe: true }];
+            });
+        }
+        // Update sidebar
+        setConversations(prev => prev.map(c => 
+            String(c._id) === msgConvId ? { ...c, latestMessage: message } : c
+        ));
+    };
+
+    const handleMessageStatus = ({ messageId, conversationId: statusConvId, status }) => {
+      if (String(statusConvId) === String(activeConvRef.current)) {
+        setMessages(prev => prev.map(m => 
+          m._id === messageId ? { ...m, status } : m
+        ));
+      }
+      setConversations(prev => prev.map(c => 
+        c.latestMessage?._id === messageId ? { ...c, latestMessage: { ...c.latestMessage, status } } : c
+      ));
+    };
+
+    socket.on("receive_message", handleNewMessage);
+    socket.on("message_sent", handleMessageSent);
+    socket.on("message_status", handleMessageStatus);
+
+    return () => {
+      socket.off("receive_message", handleNewMessage);
+      socket.off("message_sent", handleMessageSent);
+      socket.off("message_status", handleMessageStatus);
+    };
+  }, [socket, dbUser, fetchConversations]);
+
+  // Handle Room Joining
+  useEffect(() => {
+    if (socket && conversationId) {
+      socket.emit("join_chat", conversationId);
+      return () => socket.emit("leave_chat", conversationId);
+    }
+  }, [socket, conversationId]);
 
   // Auto-scroll
   useEffect(() => {
@@ -232,11 +257,12 @@ export default function Messages() {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !itemId) return;
+    if (!newMessage.trim() || !itemId || !dbUser) return;
     setSending(true);
 
+    const tempId = `temp-${Date.now()}`;
     const optimistic = {
-      _id: `temp-${Date.now()}`,
+      _id: tempId,
       message: newMessage,
       sender: { _id: dbUser?._id, firstName: dbUser?.firstName, avatar: dbUser?.avatar },
       createdAt: new Date().toISOString(),
@@ -244,29 +270,42 @@ export default function Messages() {
       isMe: true
     };
     setMessages(prev => [...prev, optimistic]);
+    const messageText = newMessage;
     setNewMessage("");
 
+    // If socket is connected, use it for instant delivery
+    if (socket && isConnected) {
+      socket.emit("send_message", {
+        itemId,
+        message: messageText,
+        receiverId: otherUser?._id,
+        senderId: dbUser._id
+      });
+      setSending(false);
+      return;
+    }
+
+    // Fallback to REST if socket is not available
     try {
       const res = await fetchWithAuth(
         `/messages/${itemId}`,
         { 
           method: "POST", 
           body: JSON.stringify({ 
-            message: newMessage,
-            receiverId: otherUser?._id // Explicitly pass the intended receiver
+            message: messageText,
+            receiverId: otherUser?._id
           }) 
         },
         getToken
       );
-      setMessages(prev => prev.map(m => m._id === optimistic._id ? { ...res.data, isMe: true } : m));
+      setMessages(prev => prev.map(m => m._id === tempId ? { ...res.data, isMe: true } : m));
       
-      // Update sidebar preview
       setConversations(prev => prev.map(c => 
         c._id === conversationId ? { ...c, latestMessage: res.data } : c
       ));
     } catch (err) {
       toast.error(err.message || "Failed to send message.");
-      setMessages(prev => prev.filter(m => m._id !== optimistic._id));
+      setMessages(prev => prev.filter(m => m._id !== tempId));
     } finally {
       setSending(false);
     }

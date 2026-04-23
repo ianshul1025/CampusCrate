@@ -121,7 +121,54 @@ export const initSocket = (server) => {
         });
 
         // ── Message Lifecycle ────────────────────────────────────────────────
-        socket.on("message_delivered", async ({ messageId, itemId, senderId }) => {
+        socket.on("send_message", async ({ itemId, message, receiverId, senderId }) => {
+            if (!itemId || !message || !receiverId || !senderId) return;
+            try {
+                const Message = (await import("./models/message.model.js")).default;
+                const Item = (await import("./models/item.model.js")).default;
+                const { Conversation } = await import("./models/conversation.model.js");
+                const User = (await import("./models/user.model.js")).default;
+
+                // Find or create conversation
+                let conversation = await Conversation.findOne({
+                    item: itemId,
+                    participants: { $all: [senderId, receiverId] }
+                });
+
+                if (!conversation) {
+                    conversation = await Conversation.create({
+                        item: itemId,
+                        participants: [senderId, receiverId]
+                    });
+                }
+
+                const newMessage = await Message.create({
+                    sender: senderId,
+                    receiver: receiverId,
+                    item: itemId,
+                    conversation: conversation._id,
+                    message: message.trim(),
+                    status: onlineUsers.has(String(receiverId)) ? "delivered" : "sent"
+                });
+
+                conversation.latestMessage = newMessage._id;
+                await conversation.save();
+                await newMessage.populate("sender", "firstName lastName avatar");
+
+                const messagePayload = newMessage.toObject();
+
+                // Emit back to sender
+                emitToUser(senderId, "message_sent", { ...messagePayload, isMe: true });
+
+                // Emit to receiver
+                emitToUser(receiverId, "receive_message", { ...messagePayload, isMe: false });
+
+            } catch (error) {
+                console.error("Error in send_message socket handler:", error);
+            }
+        });
+
+        socket.on("message_delivered", async ({ messageId, senderId }) => {
             if (!messageId || !senderId) return;
             try {
                 const Message = (await import("./models/message.model.js")).default;

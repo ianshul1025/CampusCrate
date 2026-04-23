@@ -110,15 +110,11 @@ export const sendMessage = asyncHandler(async (req, res) => {
     // Emit real-time message ONLY to the specific receiver's private room
     const messagePayload = newMessage.toObject()
 
-    // Emit status update back to sender's room
-    emitToUser(senderId, "message_status", {
-        messageId: newMessage._id,
-        conversationId: conversation._id,
-        status: newMessage.status
-    })
+    // Emit back to the sender as well to sync multiple tabs
+    emitToUser(senderId, "message_sent", { ...messagePayload, isMe: true })
 
     // Also emit to the receiver's private room for unread count / sidebar
-    emitToUser(receiverId.toString(), "new_message", { ...messagePayload, isMe: false })
+    emitToUser(receiverId.toString(), "receive_message", { ...messagePayload, isMe: false })
 
     // Create in-app notification (only when receiver is NOT currently viewing the chat)
     const notification = await Notification.create({
