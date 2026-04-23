@@ -192,22 +192,13 @@ export const verifyClaim = asyncHandler(async (req, res) => {
     claim.status = status
     await claim.save()
 
-    // If approved, automatically reject all other pending claims for this item
+    // If approved, create or find a conversation for this specific item + pair
     if (status === "approved") {
-        await Claim.updateMany(
-            { 
-                itemId: claim.itemId._id, 
-                _id: { $ne: claimId },
-                status: "pending"
-            },
-            { $set: { status: "rejected" } }
-        )
-
-        // Create or find a conversation for this item + pair
         const posterId = claim.itemId.reportedBy
         const claimantId = claim.claimantId
         
         let conversation = await Conversation.findOne({
+            item: claim.itemId._id,
             participants: { $all: [posterId, claimantId] }
         })
 
@@ -216,9 +207,6 @@ export const verifyClaim = asyncHandler(async (req, res) => {
                 item: claim.itemId._id,
                 participants: [posterId, claimantId]
             })
-        } else {
-            conversation.item = claim.itemId._id
-            await conversation.save()
         }
     }
 

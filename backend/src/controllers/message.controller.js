@@ -35,22 +35,30 @@ export const sendMessage = asyncHandler(async (req, res) => {
     // Find approved claim for this item
     const senderId = req.user._id.toString()
     const posterId = item.reportedBy._id.toString()
+    
+    // Explicitly allow passing receiverId from body to handle multiple claimers
+    let { receiverId } = req.body
 
-    const anyApprovedClaim = await Claim.findOne({ itemId, status: "approved" })
-
-    if (!anyApprovedClaim) {
-        throw new ApiError(403, "Chat not available until a claim has been approved for this item")
+    if (!receiverId) {
+        // Fallback logic if receiverId is not provided
+        const anyApprovedClaim = await Claim.findOne({ itemId, status: "approved" })
+        if (!anyApprovedClaim) {
+            throw new ApiError(403, "Chat not available until a claim has been approved for this item")
+        }
+        receiverId = senderId === posterId ? anyApprovedClaim.claimantId.toString() : posterId
     }
 
-    const claimantId = anyApprovedClaim.claimantId.toString()
-    const isParticipant = senderId === posterId || senderId === claimantId
+    // Verify participant validity
+    const isPoster = senderId === posterId || receiverId === posterId
+    const isApprovedClaimant = await Claim.findOne({ 
+        itemId, 
+        status: "approved", 
+        claimantId: senderId === posterId ? receiverId : senderId 
+    })
 
-    if (!isParticipant) {
+    if (!isPoster || !isApprovedClaimant) {
         throw new ApiError(403, "You are not a participant in this conversation. Only the approved claimant and the item poster can chat.")
     }
-
-    // Determine receiver
-    const receiverId = senderId === posterId ? anyApprovedClaim.claimantId : item.reportedBy._id
 
     // Check block status
     const sender = await User.findById(req.user._id)
@@ -63,14 +71,13 @@ export const sendMessage = asyncHandler(async (req, res) => {
         throw new ApiError(403, "This chat has been blocked by the other user")
     }
 
-    // Find or create conversation
+    // Find or create conversation for THIS SPECIFIC ITEM and participant pair
     let conversation = await Conversation.findOne({
         item: itemId,
         participants: { $all: [senderId, receiverId] }
     })
 
     if (!conversation) {
-        // Fallback for existing items before migration
         conversation = await Conversation.create({
             item: itemId,
             participants: [senderId, receiverId]
@@ -163,28 +170,42 @@ When the receiver fetches messages, marks all "sent" messages as "delivered".
 export const getItemMessages = asyncHandler(async (req, res) => {
 
     const { itemId } = req.params
-
-    const anyApprovedClaim = await Claim.findOne({ itemId, status: "approved" })
-
-    if (!anyApprovedClaim) {
-        throw new ApiError(403, "Chat not available until a claim has been approved")
-    }
+    const { otherUserId: queryOtherUserId } = req.query
+    const currentUserId = req.user._id.toString()
 
     const item = await Item.findById(itemId)
     if (!item) throw new ApiError(404, "Item not found")
 
-    const currentUserId = req.user._id.toString()
     const posterId = item.reportedBy.toString()
-    const claimantId = anyApprovedClaim.claimantId.toString()
+    let otherUserId = queryOtherUserId
 
-    if (currentUserId !== posterId && currentUserId !== claimantId) {
+    if (!otherUserId) {
+        // If not provided, try to infer it. 
+        // If I'm NOT the poster, the other user is the poster.
+        if (currentUserId !== posterId) {
+            otherUserId = posterId
+        } else {
+            // I'm the poster, I need to know WHO I want to chat with.
+            // Fallback to the first approved claim if nothing else.
+            const anyApprovedClaim = await Claim.findOne({ itemId, status: "approved" })
+            if (!anyApprovedClaim) {
+                throw new ApiError(403, "Chat not available until a claim has been approved")
+            }
+            otherUserId = anyApprovedClaim.claimantId.toString()
+        }
+    }
+
+    // Verify participants
+    const isParticipant = (currentUserId === posterId && await Claim.findOne({ itemId, claimantId: otherUserId, status: "approved" })) ||
+                          (otherUserId === posterId && await Claim.findOne({ itemId, claimantId: currentUserId, status: "approved" }))
+
+    if (!isParticipant) {
         throw new ApiError(403, "You are not a participant in this conversation")
     }
 
-    const otherUserId = currentUserId === posterId ? claimantId : posterId
     const otherUserFull = await User.findById(otherUserId).select("firstName lastName avatar")
 
-    // Find the conversation
+    // Find the conversation specifically for this item
     const conversation = await Conversation.findOne({
         item: itemId,
         participants: { $all: [currentUserId, otherUserId] }
@@ -215,9 +236,6 @@ export const getItemMessages = asyncHandler(async (req, res) => {
             { _id: { $in: ids } },
             { $set: { status: "delivered" } }
         )
-
-        // Determine the sender for status notifications (the other participant)
-        const otherUserId = currentUserId === posterId ? claimantId : posterId
 
         // Emit individual status updates to the message sender
         for (const msg of sentToMe) {
@@ -301,15 +319,10 @@ export const getUserConversations = asyncHandler(async (req, res) => {
     const blockedItems = user.blockedChats?.map(id => id.toString()) || []
 
     const conversations = []
-    const seenUsers = new Set()
 
     for (const conv of dbConversations) {
         const otherUser = conv.participants.find(p => p._id.toString() !== userId.toString())
         if (!otherUser) continue
-
-        // Strictly one chat per user in the sidebar
-        if (seenUsers.has(otherUser._id.toString())) continue
-        seenUsers.add(otherUser._id.toString())
 
         if (conv.item && blockedItems.includes(conv.item._id.toString())) continue
 
@@ -340,45 +353,7 @@ export const getUserConversations = asyncHandler(async (req, res) => {
 
 
 
-/*
-Get total unread count across all chats – GET /messages/unread/count
-*/
-export const getUnreadCount = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id)
-    const myBlocked = user.blockedChats?.map(id => id.toString()) || []
 
-    const unreadItemIds = await Message.distinct("item", {
-        receiver: req.user._id,
-        status: { $in: ["sent", "delivered"] },
-        item: { $nin: myBlocked }
-    })
-
-    if (unreadItemIds.length === 0) {
-        return res.status(200).json(new ApiResponse(200, { unreadCount: 0 }, "Unread count fetched"))
-    }
-
-    let finalCount = 0
-    for (const itemId of unreadItemIds) {
-        const item = await Item.findById(itemId)
-        if (!item) continue
-
-        const claim = await Claim.findOne({ itemId, status: "approved" })
-        if (!claim) continue
-
-        const otherId = req.user._id.toString() === item.reportedBy.toString()
-            ? claim.claimantId
-            : item.reportedBy
-        const otherUser = await User.findById(otherId)
-        
-        if (otherUser?.blockedChats?.some(id => id.toString() === itemId.toString())) continue
-        
-        finalCount++
-    }
-
-    return res.status(200).json(
-        new ApiResponse(200, { unreadCount: finalCount }, "Unread conversation count fetched")
-    )
-})
 
 
 
@@ -388,20 +363,28 @@ Advances status from sent/delivered → read and notifies sender via socket.
 */
 export const markAsRead = asyncHandler(async (req, res) => {
     const { itemId } = req.params
+    const { otherUserId: queryOtherUserId } = req.query
     const currentUserId = req.user._id.toString()
 
-    // Find the item to get participant context
     const item = await Item.findById(itemId)
     if (!item) throw new ApiError(404, "Item not found")
 
     const posterId = item.reportedBy.toString()
-    const anyApprovedClaim = await Claim.findOne({ itemId, status: "approved" })
-    if (!anyApprovedClaim) throw new ApiError(403, "No approved claim found")
-    const claimantId = anyApprovedClaim.claimantId.toString()
-    const otherUserId = currentUserId === posterId ? claimantId : posterId
+    let otherUserId = queryOtherUserId
+
+    if (!otherUserId) {
+        if (currentUserId !== posterId) {
+            otherUserId = posterId
+        } else {
+            const anyApprovedClaim = await Claim.findOne({ itemId, status: "approved" })
+            if (!anyApprovedClaim) throw new ApiError(403, "No approved claim found")
+            otherUserId = anyApprovedClaim.claimantId.toString()
+        }
+    }
 
     // Find the conversation
     const conversation = await Conversation.findOne({
+        item: itemId,
         participants: { $all: [currentUserId, otherUserId] }
     })
 
@@ -498,15 +481,27 @@ Counts how many unique conversations have unread messages for the user.
 */
 export const getUnreadCount = asyncHandler(async (req, res) => {
     const userId = req.user._id
+    const user = await User.findById(userId)
+    const myBlocked = user.blockedChats?.map(id => id.toString()) || []
 
-    // Find all conversations where the user is a participant
+    // Find all conversations where the user is a participant and the item is not blocked by current user
     const conversations = await Conversation.find({
-        participants: userId
+        participants: userId,
+        item: { $nin: myBlocked }
     })
 
     let unreadConversationsCount = 0
 
     for (const conv of conversations) {
+        // Check if other user blocked this chat
+        const otherUserId = conv.participants.find(p => p.toString() !== userId.toString())
+        if (otherUserId) {
+            const otherUser = await User.findById(otherUserId)
+            if (otherUser?.blockedChats?.some(id => id.toString() === conv.item.toString())) {
+                continue
+            }
+        }
+
         const count = await Message.countDocuments({
             conversation: conv._id,
             receiver: userId,

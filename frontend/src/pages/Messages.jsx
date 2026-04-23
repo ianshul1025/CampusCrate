@@ -96,9 +96,13 @@ export default function Messages() {
           setClaimStatus(claimData.data?.status || null);
         } catch { setClaimStatus(null); }
 
-        // Fetch messages
+        // Fetch messages with otherUserId if available
         try {
-          const resData = await fetchWithAuth(`/messages/${itemId}`, {}, getToken);
+          const url = urlOtherUserId 
+            ? `/messages/${itemId}?otherUserId=${urlOtherUserId}` 
+            : `/messages/${itemId}`;
+            
+          const resData = await fetchWithAuth(url, {}, getToken);
           const { messages: msgs, conversationId: cId, otherUser: oUser } = resData.data || {};
           setMessages(msgs || []);
           setConversationId(cId);
@@ -111,7 +115,10 @@ export default function Messages() {
           }
 
           // Mark as read
-          await fetchWithAuth(`/messages/${itemId}/read`, { method: "PATCH" }, getToken);
+          const readUrl = urlOtherUserId 
+            ? `/messages/${itemId}/read?otherUserId=${urlOtherUserId}` 
+            : `/messages/${itemId}/read`;
+          await fetchWithAuth(readUrl, { method: "PATCH" }, getToken);
           
           // Update local conversation list unread count
           setConversations(prev => prev.map(c => 
@@ -188,7 +195,10 @@ export default function Messages() {
                 conversationId: conversationId, 
                 senderId: message.sender?._id || message.sender 
             });
-            fetchWithAuth(`/messages/${itemId}/read`, { method: "PATCH" }, getToken).catch(() => {});
+            const readUrl = urlOtherUserId 
+                ? `/messages/${itemId}/read?otherUserId=${urlOtherUserId}` 
+                : `/messages/${itemId}/read`;
+            fetchWithAuth(readUrl, { method: "PATCH" }, getToken).catch(() => {});
         }
       });
 
@@ -239,7 +249,13 @@ export default function Messages() {
     try {
       const res = await fetchWithAuth(
         `/messages/${itemId}`,
-        { method: "POST", body: JSON.stringify({ message: newMessage }) },
+        { 
+          method: "POST", 
+          body: JSON.stringify({ 
+            message: newMessage,
+            receiverId: otherUser?._id // Explicitly pass the intended receiver
+          }) 
+        },
         getToken
       );
       setMessages(prev => prev.map(m => m._id === optimistic._id ? { ...res.data, isMe: true } : m));

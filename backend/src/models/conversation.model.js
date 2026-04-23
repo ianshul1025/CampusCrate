@@ -22,8 +22,7 @@ const conversationSchema = new Schema(
     { timestamps: true }
 );
 
-// Ensure only one conversation exists between any two users
-// Note: In production, we'd sort participants before saving to make this work perfectly
-conversationSchema.index({ participants: 1 });
+// Ensure a unique conversation exists for each item and pair of participants
+conversationSchema.index({ item: 1, participants: 1 }, { unique: true });
 
 export const Conversation = mongoose.model("Conversation", conversationSchema);
