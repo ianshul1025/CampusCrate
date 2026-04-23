@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { 
   MapPin, Calendar, AlertCircle, Filter,
   Monitor, Shirt, Key, Book, MoreHorizontal,
   ChevronDown, LayoutGrid, List as ListIcon,
   X, PackageSearch, ChevronRight, ChevronLeft,
-  Briefcase, Package, Eye, Pencil, CreditCard
+  Briefcase, Package, Eye, Pencil, CreditCard,
+  Search, PlusCircle
 } from "lucide-react";
 
 import Navbar from "../components/Navbar";
@@ -37,6 +38,7 @@ export default function Dashboard() {
   const { getToken } = useAuth();
   const { dbUser } = useDbAuth();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -105,12 +107,22 @@ export default function Dashboard() {
 
       <div>
         <h3 className="text-[11px] font-bold text-muted-foreground tracking-widest mb-3 uppercase">Search</h3>
-        <Input
-          placeholder="Search items..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="bg-secondary border-border h-10 rounded-lg"
-        />
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+            className="flex-1 bg-secondary border-border h-11 rounded-lg px-3 py-2 w-full text-base"
+          />
+          <button
+            onClick={() => {}}
+            className="h-11 w-11 shrink-0 flex items-center justify-center rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 ease-in-out"
+            aria-label="Search"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       <div>
@@ -158,7 +170,7 @@ export default function Dashboard() {
         {/* Sidebar Filters */}
         <aside className="w-[280px] border-r border-border bg-background/50 hidden md:flex flex-col overflow-y-auto z-10 shrink-0">
           <div className="p-6">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Filter className="h-5 w-5 text-primary" />
                 <h2 className="font-bold text-lg tracking-tight">Filters</h2>
@@ -171,15 +183,33 @@ export default function Dashboard() {
               </button>
             </div>
 
+            {/* Report Item Button */}
+            <Button
+              onClick={() => navigate('/report')}
+              className="w-full mb-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all duration-200 ease-in-out gap-2"
+            >
+              <PlusCircle className="h-4 w-4" /> Report Item
+            </Button>
+
             {/* Search */}
             <div className="mb-8">
               <h3 className="text-[11px] font-bold text-muted-foreground tracking-widest mb-3 uppercase">Search</h3>
-              <Input
-                placeholder="Search items..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-secondary border-border h-10 rounded-lg"
-              />
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Search items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+                  className="flex-1 bg-secondary border-border h-10 rounded-lg px-3 py-2 w-full"
+                />
+                <button
+                  onClick={() => {}}
+                  className="h-10 w-10 shrink-0 flex items-center justify-center rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 ease-in-out"
+                  aria-label="Search"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             {/* Categories */}
@@ -235,7 +265,7 @@ export default function Dashboard() {
 
               <div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6 mb-6">
                 <div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-3xl font-extrabold tracking-tight mb-2">
                       {searchQuery ? `Results for "${searchQuery}"` : "All Items Feed"}
                     </h1>
@@ -248,6 +278,15 @@ export default function Dashboard() {
                     >
                       <Filter className="h-4 w-4 mr-1.5" />
                       Filter
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => navigate('/report')}
+                      className="md:hidden mb-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg gap-1.5 transition-all duration-200 ease-in-out"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      Report Item
                     </Button>
                   </div>
                   <p className="text-muted-foreground font-medium">

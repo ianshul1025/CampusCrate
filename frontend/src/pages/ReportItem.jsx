@@ -136,7 +136,7 @@ export default function ReportItem() {
 
           <div className="mb-10 lg:mb-12">
             <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 text-foreground">
-              Report an Item
+              Report an <span className="text-primary">Item</span>
             </h1>
             <p className="text-xl text-muted-foreground">
               Provide details to help reunite this item with its owner.
@@ -147,12 +147,9 @@ export default function ReportItem() {
             
             {/* STEP 1: Type Selection */}
             <div className="space-y-4">
-               <div className="flex items-center gap-3">
-                 <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">1</div>
-                 <h2 className="text-2xl font-bold text-foreground">Report Type</h2>
-               </div>
+               <h2 className="text-2xl font-bold text-foreground">Report <span className="text-primary">Type</span></h2>
                
-               <div className="grid grid-cols-2 gap-4 ml-11">
+               <div className="grid grid-cols-2 gap-4">
                   <label className={`cursor-pointer border-2 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all ${formData.status === 'Lost' ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(37,99,235,0.15)]' : 'border-border bg-card/30 hover:bg-secondary hover:border-border'}`}>
                     <input type="radio" name="status" value="Lost" checked={formData.status === 'Lost'} onChange={handleChange} className="sr-only" />
                     <Search className={`h-8 w-8 ${formData.status === 'Lost' ? 'text-primary' : 'text-muted-foreground'}`} />
@@ -175,12 +172,9 @@ export default function ReportItem() {
 
             {/* STEP 2: Basic Info (Category & Title) */}
             <div className="space-y-6">
-               <div className="flex items-center gap-3">
-                 <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">2</div>
-                 <h2 className="text-2xl font-bold text-foreground">Item Basic Info</h2>
-               </div>
+               <h2 className="text-2xl font-bold text-foreground">Item Basic <span className="text-primary">Info</span></h2>
                
-               <div className="ml-11 space-y-6">
+               <div className="space-y-6">
                  <div>
                    <Label className="text-base text-muted-foreground mb-3 block">What kind of item is it?</Label>
                    <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
@@ -218,12 +212,9 @@ export default function ReportItem() {
 
             {/* STEP 3: Details */}
             <div className="space-y-6">
-               <div className="flex items-center gap-3">
-                 <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">3</div>
-                 <h2 className="text-2xl font-bold text-foreground">Specific Details</h2>
-               </div>
+               <h2 className="text-2xl font-bold text-foreground">Specific <span className="text-primary">Details</span></h2>
 
-               <div className="ml-11 space-y-6">
+               <div className="space-y-6">
                  <div className="space-y-2">
                    <Label className="text-base text-muted-foreground">Detailed Description</Label>
                    <Textarea 
@@ -286,12 +277,9 @@ export default function ReportItem() {
 
             {/* STEP 4: Photo */}
             <div className="space-y-4">
-               <div className="flex items-center gap-3">
-                 <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">4</div>
-                 <h2 className="text-2xl font-bold text-foreground">Add a Photo <span className="text-muted-foreground text-sm font-normal ml-2">(Optional)</span></h2>
-               </div>
+               <h2 className="text-2xl font-bold text-foreground">Add a <span className="text-primary">Photo</span> <span className="text-muted-foreground text-sm font-normal ml-2">(Optional)</span></h2>
 
-               <div className="ml-11">
+               <div>
                  <div className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${formData.imageUrl ? 'border-primary/50 bg-primary/5' : 'border-border hover:border-primary/50 bg-secondary hover:bg-card'}`}>
                     {formData.imageUrl ? (
                       <div className="flex flex-col items-center relative group isolate">
@@ -352,7 +340,7 @@ export default function ReportItem() {
             </div>
 
             {/* Submit */}
-            <div className="ml-11 pt-6 border-t border-border pb-20">
+            <div className="pt-6 border-t border-border pb-20">
               <Button 
                 type="submit" 
                 className="w-full text-lg h-16 rounded-2xl font-bold shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:shadow-[0_0_40px_rgba(37,99,235,0.6)] transition-all"

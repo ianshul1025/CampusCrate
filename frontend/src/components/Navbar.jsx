@@ -224,10 +224,10 @@ export default function Navbar() {
             <div className="relative" ref={notifRef}>
               <button
                 onClick={openNotifications}
-                className="relative h-9 w-9 flex items-center justify-center rounded-full bg-secondary hover:bg-secondary border border-border hover:border-border transition-all"
+                className="relative h-10 w-10 p-2 flex items-center justify-center rounded-full bg-secondary hover:bg-secondary border border-border hover:border-border transition-all"
                 aria-label="Notifications"
               >
-                <Bell className="h-4 w-4 text-muted-foreground" />
+                <Bell className="text-lg sm:text-xl text-muted-foreground" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-foreground leading-none">
                     {unreadCount > 9 ? "9+" : unreadCount}
@@ -236,7 +236,7 @@ export default function Navbar() {
               </button>
 
               {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-border bg-card shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+                <div className="absolute right-0 mt-2 w-[min(320px,calc(100vw-1rem))] rounded-2xl border border-border bg-card shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
                   <div className="px-4 py-3 border-b border-border bg-secondary flex items-center justify-between">
                     <h3 className="font-bold text-foreground text-sm">Notifications</h3>
                     {notifications.length > 0 && (
