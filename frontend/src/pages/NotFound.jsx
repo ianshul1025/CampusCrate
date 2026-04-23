@@ -19,15 +19,15 @@ export default function NotFound() {
 
         {/* 404 display */}
         <div className="relative mb-8">
-          <p className="text-[120px] sm:text-[160px] font-black leading-none text-white/5 select-none absolute inset-0 flex items-center justify-center">
+          <p className="text-[120px] sm:text-[160px] font-black leading-none text-foreground/5 select-none absolute inset-0 flex items-center justify-center">
             404
           </p>
-          <div className="relative z-10 h-32 sm:h-40 w-32 sm:w-40 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl mx-auto">
+          <div className="relative z-10 h-32 sm:h-40 w-32 sm:w-40 rounded-3xl bg-secondary border border-border flex items-center justify-center shadow-2xl mx-auto">
             <Search className="h-14 w-14 sm:h-16 sm:w-16 text-primary/40" />
           </div>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3 text-white">
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3 text-foreground">
           Page not found
         </h1>
         <p className="text-muted-foreground text-base sm:text-lg mb-10 leading-relaxed">
@@ -44,7 +44,7 @@ export default function NotFound() {
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-semibold text-sm text-muted-foreground hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+            className="flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-semibold text-sm text-muted-foreground hover:text-foreground bg-secondary hover:bg-secondary border border-border transition-all"
           >
             <ArrowLeft className="h-4 w-4" />
             Go Back

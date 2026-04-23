@@ -4,7 +4,7 @@ import { useUser, useClerk } from "@clerk/clerk-react";
 import {
   Home, PlusCircle, Box, User, LogOut, Settings,
   ChevronDown, LayoutGrid, Bell, CheckCheck,
-  ShieldCheck, Package, XCircle, MessageSquare, Bookmark, Trash2, Menu
+  ShieldCheck, Package, XCircle, MessageSquare, Bookmark, Trash2, Menu, Sun, Moon
 } from "lucide-react";
 import { 
   AlertDialog, AlertDialogAction, AlertDialogCancel, 
@@ -20,6 +20,7 @@ import { useAuth } from "@clerk/clerk-react";
 import { useSocket } from "../context/SocketContext";
 import { toast } from "sonner";
 import { usePushNotifications } from "../hooks/usePushNotifications";
+import { useTheme } from "next-themes";
 
 export default function Navbar() {
   const { user } = useUser();
@@ -29,6 +30,13 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { socket } = useSocket();
+  
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -178,14 +186,14 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="border-b border-white/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50">
+    <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <Box className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold tracking-tight text-white">CampusCrate</span>
+            <span className="text-xl font-bold tracking-tight text-foreground">CampusCrate</span>
           </Link>
 
           {/* Desktop Links */}
@@ -199,7 +207,7 @@ export default function Navbar() {
                     key={link.name}
                     variant={isActive ? "secondary" : "ghost"}
                     asChild
-                    className={`rounded-full font-medium ${isActive ? "bg-white/10 text-white hover:bg-white/20" : "text-muted-foreground hover:text-white hover:bg-white/5"}`}
+                    className={`rounded-full font-medium ${isActive ? "bg-secondary text-foreground hover:bg-secondary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                   >
                     <Link to={link.path}>
                       <Icon size={18} className="mr-2" />
@@ -210,27 +218,27 @@ export default function Navbar() {
               })}
             </div>
 
-            <div className="h-6 w-px bg-white/10" />
+            <div className="h-6 w-px bg-secondary" />
 
             {/* Notification Bell */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={openNotifications}
-                className="relative h-9 w-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all"
+                className="relative h-9 w-9 flex items-center justify-center rounded-full bg-secondary hover:bg-secondary border border-border hover:border-border transition-all"
                 aria-label="Notifications"
               >
                 <Bell className="h-4 w-4 text-muted-foreground" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
+                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-foreground leading-none">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
               </button>
 
               {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-white/10 bg-card shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
-                  <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex items-center justify-between">
-                    <h3 className="font-bold text-white text-sm">Notifications</h3>
+                <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-border bg-card shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+                  <div className="px-4 py-3 border-b border-border bg-secondary flex items-center justify-between">
+                    <h3 className="font-bold text-foreground text-sm">Notifications</h3>
                     {notifications.length > 0 && (
                       <span className="text-[10px] text-muted-foreground">{notifications.length} total</span>
                     )}
@@ -244,7 +252,7 @@ export default function Navbar() {
                       </div>
                     ) : (
                       notifications.map((n) => (
-                        <div key={n._id} className="relative group overflow-hidden border-b border-white/5 last:border-0 h-24">
+                        <div key={n._id} className="relative group overflow-hidden border-b border-border last:border-0 h-24">
                           {/* Slide-out Trash Icon */}
                           <div className="absolute inset-y-0 right-0 w-16 flex items-center justify-center bg-red-600 translate-x-full group-hover:translate-x-0 transition-transform duration-200 z-0">
                             <button
@@ -252,7 +260,7 @@ export default function Navbar() {
                                 e.stopPropagation();
                                 setNotificationToRemove(n._id);
                               }}
-                              className="text-white hover:scale-110 transition-transform p-3"
+                              className="text-foreground hover:scale-110 transition-transform p-3"
                               title="Delete notification"
                             >
                               <Trash2 className="h-5 w-5" />
@@ -261,7 +269,7 @@ export default function Navbar() {
 
                           {/* Main Notification Card Content (Slides left on group hover) */}
                           <button
-                            className={`w-full h-full flex items-start gap-3 px-4 py-3 bg-card hover:bg-white/5 transition-transform duration-200 text-left relative z-10 group-hover:-translate-x-16 ${!n.isRead ? "bg-primary/5" : ""}`}
+                            className={`w-full h-full flex items-start gap-3 px-4 py-3 bg-card hover:bg-secondary transition-transform duration-200 text-left relative z-10 group-hover:-translate-x-16 ${!n.isRead ? "bg-primary/5" : ""}`}
                             onClick={async () => {
                               setNotifOpen(false);
                               // Optimized performance: instantly update UI
@@ -281,7 +289,7 @@ export default function Navbar() {
                           >
                             {notifIcon(n.type)}
                             <div className="min-w-0 flex-1">
-                              <p className={`text-sm font-semibold truncate ${!n.isRead ? "text-white" : "text-muted-foreground"}`}>
+                              <p className={`text-sm font-semibold truncate ${!n.isRead ? "text-foreground" : "text-muted-foreground"}`}>
                                 {n.title}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
@@ -296,7 +304,6 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            
             {/* Saved Items Icon */}
             <div className="relative">
               <button
@@ -304,7 +311,7 @@ export default function Navbar() {
                 className={`relative h-9 w-9 flex items-center justify-center rounded-full border transition-all ${
                   location.pathname === "/saved-items"
                     ? "bg-primary/20 border-primary/40 text-primary"
-                    : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:border-white/20 hover:text-white"
+                    : "bg-secondary border-border text-muted-foreground hover:bg-secondary hover:border-border hover:text-foreground"
                 }`}
                 aria-label="Saved Items"
               >
@@ -319,33 +326,44 @@ export default function Navbar() {
                 className={`relative h-9 w-9 flex items-center justify-center rounded-full border transition-all ${
                   location.pathname === "/messages"
                     ? "bg-primary/20 border-primary/40 text-primary"
-                    : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:border-white/20 hover:text-white"
+                    : "bg-secondary border-border text-muted-foreground hover:bg-secondary hover:border-border hover:text-foreground"
                 }`}
                 aria-label="Messages"
               >
                 <MessageSquare className="h-4 w-4" />
                 {unreadMessages > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
+                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-foreground leading-none">
                     {unreadMessages > 9 ? "9+" : unreadMessages}
                   </span>
                 )}
               </button>
             </div>
 
+            {/* Theme Toggle */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                className="relative h-9 w-9 flex items-center justify-center rounded-full bg-secondary hover:bg-secondary/80 border border-border transition-all text-muted-foreground hover:text-foreground"
+                aria-label="Toggle theme"
+              >
+                {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            )}
+
             {/* Profile Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all group"
+                className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary border border-border hover:border-border transition-all group"
                 aria-label="Open user menu"
               >
-                <Avatar className="h-7 w-7 border border-white/20">
+                <Avatar className="h-7 w-7 border border-border">
                   <AvatarImage src={user?.imageUrl} alt={displayName} />
                   <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium text-white max-w-[120px] truncate hidden sm:block">
+                <span className="text-sm font-medium text-foreground max-w-[120px] truncate hidden sm:block">
                   {displayName}
                 </span>
                 <ChevronDown
@@ -356,19 +374,19 @@ export default function Navbar() {
 
               {/* Dropdown Panel */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-white/10 bg-card shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-border bg-card shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
 
                   {/* User Info Header */}
-                  <div className="px-4 py-3 border-b border-white/10 bg-white/5">
+                  <div className="px-4 py-3 border-b border-border bg-secondary">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9 border border-white/20">
+                      <Avatar className="h-9 w-9 border border-border">
                         <AvatarImage src={user?.imageUrl} />
                         <AvatarFallback className="bg-primary/20 text-primary text-sm font-bold">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+                        <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
                         <p className="text-xs text-muted-foreground truncate">
                           {dbUser?.email || user?.primaryEmailAddress?.emailAddress}
                         </p>
@@ -383,26 +401,26 @@ export default function Navbar() {
                   <div className="py-1.5">
                     <button
                       onClick={() => { setDropdownOpen(false); navigate("/profile"); }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                     >
                       <User size={16} /> My Profile
                     </button>
 
                     <button
                       onClick={() => { setDropdownOpen(false); navigate("/my-posts"); }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                     >
                       <LayoutGrid size={16} /> My Posts
                     </button>
 
                     <button
                       onClick={() => { setDropdownOpen(false); navigate("/saved-items"); }}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                     >
                       <Bookmark size={16} /> Saved Items
                     </button>
 
-                    <div className="h-px bg-white/10 my-1.5" />
+                    <div className="h-px bg-secondary my-1.5" />
 
                     <button
                       onClick={() => { setDropdownOpen(false); signOut({ redirectUrl: "/" }); }}
@@ -418,25 +436,26 @@ export default function Navbar() {
 
           {/* Mobile: quick actions + avatar */}
           <div className="md:hidden flex items-center gap-2">
+
             <button
               onClick={() => setMobileQuickOpen((prev) => !prev)}
-              className="relative h-9 w-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10"
+              className="relative h-9 w-9 flex items-center justify-center rounded-full bg-secondary border border-border"
               aria-label="Open quick actions"
               ref={mobileQuickRef}
             >
               <Menu className="h-4 w-4 text-muted-foreground" />
               {mobileQuickOpen && (
-                <div className="absolute right-0 top-11 z-50 min-w-[180px] rounded-2xl border border-white/10 bg-card p-2 shadow-2xl">
+                <div className="absolute right-0 top-11 z-50 min-w-[180px] rounded-2xl border border-border bg-card p-2 shadow-2xl">
                   <button
                     onClick={() => {
                       setMobileQuickOpen(false);
                       openNotifications();
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <span className="flex items-center gap-2"><Bell className="h-4 w-4" /> Notifications</span>
                     {unreadCount > 0 && (
-                      <span className="h-4 min-w-4 px-1 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
+                      <span className="h-4 min-w-4 px-1 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-foreground leading-none">
                         {unreadCount > 9 ? "9+" : unreadCount}
                       </span>
                     )}
@@ -446,7 +465,7 @@ export default function Navbar() {
                       setMobileQuickOpen(false);
                       navigate("/saved-items");
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <Bookmark className="h-4 w-4" /> Saved Items
                   </button>
@@ -455,11 +474,11 @@ export default function Navbar() {
                       setMobileQuickOpen(false);
                       navigate("/messages");
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <span className="flex items-center gap-2"><MessageSquare className="h-4 w-4" /> Messages</span>
                     {unreadMessages > 0 && (
-                      <span className="h-4 min-w-4 px-1 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-white leading-none">
+                      <span className="h-4 min-w-4 px-1 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-foreground leading-none">
                         {unreadMessages > 9 ? "9+" : unreadMessages}
                       </span>
                     )}
@@ -467,6 +486,15 @@ export default function Navbar() {
                 </div>
               )}
             </button>
+            {mounted && (
+              <button
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                className="relative h-9 w-9 flex items-center justify-center rounded-full bg-secondary border border-border text-muted-foreground hover:text-foreground"
+                aria-label="Toggle theme"
+              >
+                {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            )}
             <button
               onClick={() => navigate("/profile")}
               className="rounded-full ring-2 ring-white/10 p-0.5"
@@ -483,7 +511,7 @@ export default function Navbar() {
       </div>
 
       <AlertDialog open={!!notificationToRemove} onOpenChange={() => setNotificationToRemove(null)}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto backdrop-blur-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto backdrop-blur-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3">
               <Trash2 className="h-7 w-7 text-red-500" />
@@ -494,12 +522,12 @@ export default function Navbar() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 mt-8">
-            <AlertDialogCancel className="rounded-xl px-8 h-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold text-base">
+            <AlertDialogCancel className="rounded-xl px-8 h-12 border-border bg-secondary hover:bg-secondary text-foreground font-bold text-base">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => handleDeleteNotification(notificationToRemove)}
-              className="rounded-xl px-8 h-12 bg-red-600 hover:bg-red-500 text-white font-bold text-base border-0"
+              className="rounded-xl px-8 h-12 bg-red-600 hover:bg-red-500 text-primary-foreground font-bold text-base border-0"
             >
               Confirm Delete
             </AlertDialogAction>
@@ -507,7 +535,7 @@ export default function Navbar() {
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={showPushPrompt} onOpenChange={setShowPushPrompt}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-8 max-w-md mx-auto backdrop-blur-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-8 max-w-md mx-auto backdrop-blur-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold flex items-center gap-3">
               <Bell className="h-6 w-6 text-primary" />
@@ -518,7 +546,7 @@ export default function Navbar() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 mt-6">
-            <AlertDialogCancel className="rounded-xl px-4 h-10 border-white/10 bg-white/5 hover:bg-white/10 text-white">
+            <AlertDialogCancel className="rounded-xl px-4 h-10 border-border bg-secondary hover:bg-secondary text-foreground">
               Later
             </AlertDialogCancel>
             <AlertDialogAction 
@@ -526,7 +554,7 @@ export default function Navbar() {
                 subscribeUser();
                 setShowPushPrompt(false);
               }}
-              className="rounded-xl px-4 h-10 bg-primary hover:bg-primary/90 text-white border-0"
+              className="rounded-xl px-4 h-10 bg-primary hover:bg-primary/90 text-foreground border-0"
             >
               Enable Now
             </AlertDialogAction>

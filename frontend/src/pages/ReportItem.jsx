@@ -129,13 +129,13 @@ export default function ReportItem() {
           <Button 
             variant="ghost" 
             onClick={() => navigate('/dashboard')} 
-            className="mb-8 text-muted-foreground hover:text-white hover:bg-white/5 pl-0"
+            className="mb-8 text-muted-foreground hover:text-foreground hover:bg-secondary pl-0"
           >
             <ArrowLeft size={18} className="mr-2" /> Back to Dashboard
           </Button>
 
           <div className="mb-10 lg:mb-12">
-            <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 text-white">
+            <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 text-foreground">
               Report an Item
             </h1>
             <p className="text-xl text-muted-foreground">
@@ -149,24 +149,24 @@ export default function ReportItem() {
             <div className="space-y-4">
                <div className="flex items-center gap-3">
                  <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">1</div>
-                 <h2 className="text-2xl font-bold text-white">Report Type</h2>
+                 <h2 className="text-2xl font-bold text-foreground">Report Type</h2>
                </div>
                
                <div className="grid grid-cols-2 gap-4 ml-11">
-                  <label className={`cursor-pointer border-2 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all ${formData.status === 'Lost' ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(37,99,235,0.15)]' : 'border-white/10 bg-card/30 hover:bg-white/5 hover:border-white/20'}`}>
+                  <label className={`cursor-pointer border-2 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all ${formData.status === 'Lost' ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(37,99,235,0.15)]' : 'border-border bg-card/30 hover:bg-secondary hover:border-border'}`}>
                     <input type="radio" name="status" value="Lost" checked={formData.status === 'Lost'} onChange={handleChange} className="sr-only" />
                     <Search className={`h-8 w-8 ${formData.status === 'Lost' ? 'text-primary' : 'text-muted-foreground'}`} />
                     <div className="text-center">
-                       <p className={`font-bold text-lg ${formData.status === 'Lost' ? 'text-primary' : 'text-white'}`}>I Lost Something</p>
+                       <p className={`font-bold text-lg ${formData.status === 'Lost' ? 'text-primary' : 'text-foreground'}`}>I Lost Something</p>
                        <p className="text-xs text-muted-foreground mt-1">I am looking for my own item</p>
                     </div>
                   </label>
                   
-                  <label className={`cursor-pointer border-2 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all ${formData.status === 'Found' ? 'border-green-500 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'border-white/10 bg-card/30 hover:bg-white/5 hover:border-white/20'}`}>
+                  <label className={`cursor-pointer border-2 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition-all ${formData.status === 'Found' ? 'border-green-500 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'border-border bg-card/30 hover:bg-secondary hover:border-border'}`}>
                     <input type="radio" name="status" value="Found" checked={formData.status === 'Found'} onChange={handleChange} className="sr-only" />
                     <CheckCircle2 className={`h-8 w-8 ${formData.status === 'Found' ? 'text-green-500' : 'text-muted-foreground'}`} />
                     <div className="text-center">
-                       <p className={`font-bold text-lg ${formData.status === 'Found' ? 'text-green-500' : 'text-white'}`}>I Found Something</p>
+                       <p className={`font-bold text-lg ${formData.status === 'Found' ? 'text-green-500' : 'text-foreground'}`}>I Found Something</p>
                        <p className="text-xs text-muted-foreground mt-1">I want to return an item to its owner</p>
                     </div>
                   </label>
@@ -177,7 +177,7 @@ export default function ReportItem() {
             <div className="space-y-6">
                <div className="flex items-center gap-3">
                  <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">2</div>
-                 <h2 className="text-2xl font-bold text-white">Item Basic Info</h2>
+                 <h2 className="text-2xl font-bold text-foreground">Item Basic Info</h2>
                </div>
                
                <div className="ml-11 space-y-6">
@@ -192,7 +192,7 @@ export default function ReportItem() {
                            key={cat.id}
                            type="button"
                            onClick={() => setFormData(prev => ({ ...prev, category: cat.id }))}
-                           className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)]' : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 text-muted-foreground'}`}
+                           className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-all ${isSelected ? 'border-primary bg-primary/10 text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)]' : 'border-border bg-secondary hover:bg-secondary hover:border-border text-muted-foreground'}`}
                          >
                            <Icon className="h-6 w-6" />
                            <span className="text-[10px] uppercase font-bold tracking-wider">{cat.label}</span>
@@ -210,7 +210,7 @@ export default function ReportItem() {
                      placeholder="e.g., Navy Blue Herschel Backpack" 
                      value={formData.title} 
                      onChange={handleChange} 
-                     className="h-14 bg-black/40 border-white/10 text-lg placeholder:text-white/20 focus-visible:ring-primary/50 rounded-xl"
+                     className="h-14 bg-card border-border text-lg placeholder:text-muted-foreground/50 focus-visible:ring-primary/50 rounded-xl"
                    />
                  </div>
                </div>
@@ -220,7 +220,7 @@ export default function ReportItem() {
             <div className="space-y-6">
                <div className="flex items-center gap-3">
                  <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">3</div>
-                 <h2 className="text-2xl font-bold text-white">Specific Details</h2>
+                 <h2 className="text-2xl font-bold text-foreground">Specific Details</h2>
                </div>
 
                <div className="ml-11 space-y-6">
@@ -229,7 +229,7 @@ export default function ReportItem() {
                    <Textarea 
                      name="description" 
                      required 
-                     className="min-h-[140px] bg-black/40 border-white/10 text-base placeholder:text-white/20 focus-visible:ring-primary/50 rounded-xl p-4 resize-none"
+                     className="min-h-[140px] bg-card border-border text-base placeholder:text-muted-foreground/50 focus-visible:ring-primary/50 rounded-xl p-4 resize-none"
                      placeholder="Provide any identifying details like color, brand, condition, or distinctive marks to help the owner identify it." 
                      value={formData.description} 
                      onChange={handleChange} 
@@ -247,7 +247,7 @@ export default function ReportItem() {
                          placeholder="e.g., Science Library 2nd Fl" 
                          value={formData.location} 
                          onChange={handleChange} 
-                         className="h-14 pl-12 bg-black/40 border-white/10 text-base placeholder:text-white/20 focus-visible:ring-primary/50 rounded-xl"
+                         className="h-14 pl-12 bg-card border-border text-base placeholder:text-muted-foreground/50 focus-visible:ring-primary/50 rounded-xl"
                        />
                      </div>
                    </div>
@@ -262,7 +262,7 @@ export default function ReportItem() {
                          required
                          value={formData.date} 
                          onChange={handleChange} 
-                         className="h-14 pl-12 bg-black/40 border-white/10 text-base focus-visible:ring-primary/50 rounded-xl [&::-webkit-calendar-picker-indicator]:invert-[0.8] cursor-pointer"
+                         className="h-14 pl-12 bg-card border-border text-base focus-visible:ring-primary/50 rounded-xl [&::-webkit-calendar-picker-indicator]:invert-[0.8] cursor-pointer"
                        />
                      </div>
                    </div>
@@ -270,7 +270,7 @@ export default function ReportItem() {
 
                  <div className="space-y-2 pt-2">
                    <Label className="text-base text-muted-foreground flex flex-col gap-1">
-                     <span>Claim Verification Question <span className="text-white/30 text-sm font-normal">(Optional)</span></span>
+                     <span>Claim Verification Question <span className="text-muted-foreground/50 text-sm font-normal">(Optional)</span></span>
                      <span className="text-xs text-muted-foreground/70 font-normal">Ask a specific question only the true owner would know to prove ownership.</span>
                    </Label>
                    <Input 
@@ -278,7 +278,7 @@ export default function ReportItem() {
                      placeholder={formData.status === 'Found' ? "e.g., What is the lock screen wallpaper?" : "e.g., What color is the inner lining?"} 
                      value={formData.claimQuestion} 
                      onChange={handleChange} 
-                     className="h-14 bg-black/40 border-white/10 text-base placeholder:text-white/20 focus-visible:ring-primary/50 rounded-xl"
+                     className="h-14 bg-card border-border text-base placeholder:text-muted-foreground/50 focus-visible:ring-primary/50 rounded-xl"
                    />
                  </div>
                </div>
@@ -288,14 +288,14 @@ export default function ReportItem() {
             <div className="space-y-4">
                <div className="flex items-center gap-3">
                  <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30">4</div>
-                 <h2 className="text-2xl font-bold text-white">Add a Photo <span className="text-muted-foreground text-sm font-normal ml-2">(Optional)</span></h2>
+                 <h2 className="text-2xl font-bold text-foreground">Add a Photo <span className="text-muted-foreground text-sm font-normal ml-2">(Optional)</span></h2>
                </div>
 
                <div className="ml-11">
-                 <div className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${formData.imageUrl ? 'border-primary/50 bg-primary/5' : 'border-white/10 hover:border-primary/50 bg-black/20 hover:bg-black/40'}`}>
+                 <div className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${formData.imageUrl ? 'border-primary/50 bg-primary/5' : 'border-border hover:border-primary/50 bg-secondary hover:bg-card'}`}>
                     {formData.imageUrl ? (
                       <div className="flex flex-col items-center relative group isolate">
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center z-10 backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-card opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center z-10 backdrop-blur-sm">
                            <Button 
                              variant="destructive"
                              type="button" 
@@ -309,10 +309,10 @@ export default function ReportItem() {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center py-6">
-                        <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                        <div className="h-16 w-16 rounded-full bg-secondary flex items-center justify-center mb-6">
                           <UploadCloud className="h-8 w-8 text-muted-foreground" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Upload a clear photo</h3>
+                        <h3 className="text-xl font-bold text-foreground mb-2">Upload a clear photo</h3>
                         <p className="text-muted-foreground mb-8 text-sm">Drag and drop or click to browse. Max 5MB.</p>
 
                         <IKContext 
@@ -352,7 +352,7 @@ export default function ReportItem() {
             </div>
 
             {/* Submit */}
-            <div className="ml-11 pt-6 border-t border-white/10 pb-20">
+            <div className="ml-11 pt-6 border-t border-border pb-20">
               <Button 
                 type="submit" 
                 className="w-full text-lg h-16 rounded-2xl font-bold shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:shadow-[0_0_40px_rgba(37,99,235,0.6)] transition-all"

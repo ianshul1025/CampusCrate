@@ -63,7 +63,7 @@ export default function BlockedMessages() {
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/messages")} className="rounded-xl bg-white/5 border border-white/10">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/messages")} className="rounded-xl bg-secondary border border-border">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
@@ -75,14 +75,14 @@ export default function BlockedMessages() {
         <div className="grid gap-4">
           {loading ? (
             [...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-2xl bg-white/5" />
+              <Skeleton key={i} className="h-24 w-full rounded-2xl bg-secondary" />
             ))
           ) : blockedConvs.length === 0 ? (
-            <div className="py-20 text-center bg-card/30 border border-dashed border-white/10 rounded-3xl">
+            <div className="py-20 text-center bg-card/30 border border-dashed border-border rounded-3xl">
               <Ban className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30" />
-              <h3 className="text-xl font-bold text-white mb-2">No blocked chats</h3>
+              <h3 className="text-xl font-bold text-foreground mb-2">No blocked chats</h3>
               <p className="text-muted-foreground text-sm">You haven't blocked anyone yet. Safety first!</p>
-              <Button variant="outline" className="mt-6 rounded-xl border-white/10 hover:bg-white/5" onClick={() => navigate("/messages")}>
+              <Button variant="outline" className="mt-6 rounded-xl border-border hover:bg-secondary" onClick={() => navigate("/messages")}>
                 Return to Messages
               </Button>
             </div>
@@ -90,18 +90,18 @@ export default function BlockedMessages() {
             blockedConvs.map((conv) => {
               const otherUser = conv.latestMessage?.sender; // Minimal fallback
               return (
-                <div key={conv.item._id} className="group relative bg-card/40 border border-white/5 rounded-2xl p-5 flex items-center gap-5 hover:bg-white/5 transition-all">
-                  <div className="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                <div key={conv.item._id} className="group relative bg-card/40 border border-border rounded-2xl p-5 flex items-center gap-5 hover:bg-secondary transition-all">
+                  <div className="h-14 w-14 rounded-2xl bg-secondary border border-border overflow-hidden flex items-center justify-center shrink-0">
                     {conv.item.imageUrl ? (
                       <img src={conv.item.imageUrl} alt={conv.item.title} className="w-full h-full object-cover" />
                     ) : (
-                      <Package className="h-6 w-6 text-white/20" />
+                      <Package className="h-6 w-6 text-muted-foreground/50" />
                     )}
                   </div>
                   
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-white truncate text-lg">{conv.item.title}</h4>
+                      <h4 className="font-bold text-foreground truncate text-lg">{conv.item.title}</h4>
                       <Badge variant="outline" className="text-[10px] border-red-500/20 text-red-400 bg-red-500/5 px-2">BLOCKED</Badge>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -116,7 +116,7 @@ export default function BlockedMessages() {
                   <div className="shrink-0 flex items-center gap-2">
                     <Button 
                       variant="outline" 
-                      className="rounded-xl border-white/10 hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all gap-2"
+                      className="rounded-xl border-border hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all gap-2"
                       onClick={() => handleUnblock(conv.item._id)}
                       disabled={unblocking === conv.item._id}
                     >
@@ -135,7 +135,7 @@ export default function BlockedMessages() {
         </div>
 
         <div className="mt-12 p-6 rounded-3xl bg-primary/5 border border-primary/10">
-          <h3 className="flex items-center gap-2 font-bold text-white mb-2">
+          <h3 className="flex items-center gap-2 font-bold text-foreground mb-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
             Safety Guidelines
           </h3>

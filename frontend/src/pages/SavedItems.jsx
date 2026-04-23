@@ -64,11 +64,11 @@ export default function SavedItems() {
           {/* Header */}
           <div className="mb-10">
             <div className="flex items-center text-sm text-muted-foreground mb-4 gap-2 font-medium">
-              <Link to="/" className="hover:text-white transition-colors">Home</Link>
+              <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
               <ChevronRight className="h-4 w-4 opacity-50" />
-              <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+              <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
               <ChevronRight className="h-4 w-4 opacity-50" />
-              <span className="text-white font-bold">Saved Collections</span>
+              <span className="text-foreground font-bold">Saved Collections</span>
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -88,7 +88,7 @@ export default function SavedItems() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
-                <Card key={i} className="bg-card/40 border-white/5 shadow-lg rounded-2xl overflow-hidden">
+                <Card key={i} className="bg-card/40 border-border shadow-lg rounded-2xl overflow-hidden">
                   <Skeleton className="h-52 w-full rounded-none" />
                   <CardContent className="p-5">
                     <Skeleton className="h-6 w-3/4 mb-4" />
@@ -108,8 +108,8 @@ export default function SavedItems() {
               <p>{error}</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="bg-card/20 border border-white/5 p-20 rounded-3xl text-center flex flex-col items-center justify-center">
-              <div className="h-24 w-24 bg-white/5 rounded-full flex items-center justify-center mb-8">
+            <div className="bg-card/20 border border-border p-20 rounded-3xl text-center flex flex-col items-center justify-center">
+              <div className="h-24 w-24 bg-secondary rounded-full flex items-center justify-center mb-8">
                 <Bookmark className="h-12 w-12 text-muted-foreground opacity-20" />
               </div>
               <h3 className="text-3xl font-black mb-4">No saved items found</h3>
@@ -134,25 +134,25 @@ export default function SavedItems() {
                 const isReturned = item.state === "returned";
 
                 return (
-                  <Card key={item._id} className="bg-card border-white/5 hover:border-white/10 hover:bg-card/80 transition-all duration-300 shadow-lg rounded-2xl group flex flex-col overflow-hidden relative isolate">
+                  <Card key={item._id} className="bg-card border-border hover:border-border hover:bg-card/80 transition-all duration-300 shadow-lg rounded-2xl group flex flex-col overflow-hidden relative isolate">
                     
                     {/* Returned Stamp */}
                     {isReturned && (
                       <div className="absolute inset-0 z-50 pointer-events-none overflow-hidden rounded-2xl opacity-80">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-red-600/90 text-white font-black tracking-[0.2em] text-sm py-2 px-10 shadow-2xl border-y-2 border-red-500/50 backdrop-blur-md z-50 uppercase">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-red-600/90 text-foreground font-black tracking-[0.2em] text-sm py-2 px-10 shadow-2xl border-y-2 border-red-500/50 backdrop-blur-md z-50 uppercase">
                           Returned
                         </div>
                       </div>
                     )}
 
                     {/* Image Area */}
-                    <div className="h-52 bg-white/5 relative overflow-hidden flex-shrink-0">
+                    <div className="h-52 bg-secondary relative overflow-hidden flex-shrink-0">
                       {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-black/20 text-muted-foreground">
-                          <Package className="h-10 w-10 text-white/10 mb-2" />
-                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest text-center px-4">No image available</span>
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-secondary text-muted-foreground">
+                          <Package className="h-10 w-10 text-muted-foreground/30 mb-2" />
+                          <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest text-center px-4">No image available</span>
                         </div>
                       )}
 
@@ -172,7 +172,7 @@ export default function SavedItems() {
                       {/* Remove Bookmark Button (Top Right) */}
                       <button
                         onClick={() => handleToggleSave(item._id)}
-                        className="absolute top-4 right-4 z-20 h-8 w-8 bg-black/60 hover:bg-red-600 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-colors shadow-lg group/btn"
+                        className="absolute top-4 right-4 z-20 h-8 w-8 bg-card hover:bg-red-600 text-primary-foreground rounded-full flex items-center justify-center backdrop-blur-md transition-colors shadow-lg group/btn"
                         title="Remove bookmark"
                       >
                         <Bookmark className="h-4 w-4 fill-white group-hover/btn:hidden" />
@@ -183,7 +183,7 @@ export default function SavedItems() {
                     {/* Content */}
                     <CardContent className="p-5 flex-1 flex flex-col relative z-20">
                       <div className="flex justify-between items-start gap-4 mb-3">
-                        <h4 className="font-bold text-lg leading-tight line-clamp-1 text-white group-hover:text-primary transition-colors">
+                        <h4 className="font-bold text-lg leading-tight line-clamp-1 text-foreground group-hover:text-primary transition-colors">
                           {item.title}
                         </h4>
                         <span className="text-xs text-muted-foreground whitespace-nowrap mt-1 font-medium">
@@ -199,7 +199,7 @@ export default function SavedItems() {
                       )}
 
                       <div className="flex items-center gap-3 mb-5">
-                        <Avatar className="h-6 w-6 border border-white/10 bg-primary/20">
+                        <Avatar className="h-6 w-6 border border-border bg-primary/20">
                           <AvatarImage src={reporter?.avatar} />
                           <AvatarFallback className="text-primary text-[10px] font-bold">{reporterInitials}</AvatarFallback>
                         </Avatar>
@@ -209,9 +209,9 @@ export default function SavedItems() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="mt-auto pt-4 border-t border-white/5 flex gap-3">
+                      <div className="mt-auto pt-4 border-t border-border flex gap-3">
                         <Link to={`/item/${item._id}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full h-9 border-white/10 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold gap-1.5 transition-colors">
+                          <Button variant="outline" size="sm" className="w-full h-9 border-border bg-secondary hover:bg-secondary rounded-xl text-xs font-bold gap-1.5 transition-colors">
                             <Eye className="h-3.5 w-3.5" /> View Details
                           </Button>
                         </Link>

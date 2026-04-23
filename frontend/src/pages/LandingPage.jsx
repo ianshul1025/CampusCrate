@@ -10,8 +10,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Box, Search, FileText, ShieldCheck, MapPin, Clock,
   ArrowRight, Mail, Phone, Building, Package, Lock,
-  Menu, X, MessageSquare, CheckCircle2, PlusCircle
+  Menu, X, MessageSquare, CheckCircle2, PlusCircle, Sun, Moon
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 
@@ -46,6 +47,12 @@ export default function LandingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [stats, setStats] = useState({ total: 0, found: 0, lost: 0, returned: 0 });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchRecentItems = async () => {
@@ -99,7 +106,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
 
       {/* Navigation */}
-      <nav className="border-b border-white/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-2">
@@ -117,7 +124,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-3">
               <div className="hidden md:flex items-center gap-3">
                 <SignedIn>
-                  <Button variant="ghost" className="hover:bg-white/5 hover:text-white font-semibold" onClick={() => navigate("/dashboard")}>
+                  <Button variant="ghost" className="hover:bg-secondary hover:text-foreground font-semibold" onClick={() => navigate("/dashboard")}>
                     My Dashboard
                   </Button>
                   <Button className="font-semibold" onClick={() => navigate("/report")}>
@@ -126,12 +133,12 @@ export default function LandingPage() {
                 </SignedIn>
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <Button variant="ghost" className="hidden lg:flex hover:bg-white/5 hover:text-white font-semibold">Log In</Button>
+                    <Button variant="ghost" className="hidden lg:flex hover:bg-secondary hover:text-foreground font-semibold">Log In</Button>
                   </SignInButton>
                   <SignInButton mode="modal">
                     <Button className="font-semibold text-primary-foreground">Get Started</Button>
                   </SignInButton>
-                  <div className="w-px h-6 bg-white/10 mx-1" />
+                  <div className="w-px h-6 bg-secondary mx-1" />
                   <Link to="/admin/login">
                     <Button variant="ghost" size="sm" className="flex items-center gap-1.5 text-xs font-bold text-rose-400/80 hover:text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 rounded-full px-3">
                       <Lock className="h-3 w-3" /> Admin
@@ -139,6 +146,16 @@ export default function LandingPage() {
                   </Link>
                 </SignedOut>
               </div>
+
+              {mounted && (
+                <button
+                  onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                  className="relative h-9 w-9 flex items-center justify-center rounded-full bg-secondary border border-border text-muted-foreground hover:text-foreground"
+                  aria-label="Toggle theme"
+                >
+                  {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </button>
+              )}
 
               {/* Hamburger Button */}
               <button
@@ -154,12 +171,12 @@ export default function LandingPage() {
 
         {/* Mobile Menu Overlay */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 w-full bg-background/98 backdrop-blur-xl border-b border-white/5 py-8 px-4 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-200 z-50">
+          <div className="md:hidden absolute top-16 left-0 w-full bg-background/98 backdrop-blur-xl border-b border-border py-8 px-4 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-200 z-50">
             <div className="flex flex-col gap-4 text-lg font-medium">
-              <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-foreground border-b border-white/5 pb-2">Home</Link>
-              <a href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-white/5 pb-2">How It Works</a>
-              <a href="#recent-items" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-white/5 pb-2">Recent Items</a>
-              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-white/5 pb-2">Contact</a>
+              <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-foreground border-b border-border pb-2">Home</Link>
+              <a href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-border pb-2">How It Works</a>
+              <a href="#recent-items" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-border pb-2">Recent Items</a>
+              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-border pb-2">Contact</a>
             </div>
 
             <div className="flex flex-col gap-3 pt-2">
@@ -167,7 +184,7 @@ export default function LandingPage() {
                 <Button className="w-full justify-center text-base py-6" onClick={() => { navigate("/dashboard"); setIsMenuOpen(false); }}>
                   My Dashboard
                 </Button>
-                <Button variant="outline" className="w-full justify-center text-base py-6 border-white/10 bg-white/5" onClick={() => { navigate("/report"); setIsMenuOpen(false); }}>
+                <Button variant="outline" className="w-full justify-center text-base py-6 border-border bg-secondary" onClick={() => { navigate("/report"); setIsMenuOpen(false); }}>
                   Report Item
                 </Button>
               </SignedIn>
@@ -176,9 +193,9 @@ export default function LandingPage() {
                   <Button className="w-full justify-center text-base py-6 text-primary-foreground" onClick={() => setIsMenuOpen(false)}>Get Started</Button>
                 </SignInButton>
                 <SignInButton mode="modal">
-                  <Button variant="ghost" className="w-full justify-center text-base py-6 hover:bg-white/5" onClick={() => setIsMenuOpen(false)}>Log In</Button>
+                  <Button variant="ghost" className="w-full justify-center text-base py-6 hover:bg-secondary" onClick={() => setIsMenuOpen(false)}>Log In</Button>
                 </SignInButton>
-                <div className="h-px bg-white/10 my-2" />
+                <div className="h-px bg-secondary my-2" />
                 <Link to="/admin/login" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-center gap-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 py-6">
                     <Lock className="h-4 w-4" /> Admin Login
@@ -204,7 +221,7 @@ export default function LandingPage() {
           <div className="absolute inset-0 z-0 bg-gradient-to-b from-background/10 via-background/80 to-background" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
-            <Badge variant="outline" className="mb-6 px-3 py-1 bg-white/5 border-white/10 backdrop-blur-md rounded-full text-[10px] font-semibold tracking-wide text-foreground flex items-center gap-2 uppercase">
+            <Badge variant="outline" className="mb-6 px-3 py-1 bg-secondary border-border backdrop-blur-md rounded-full text-[10px] font-semibold tracking-wide text-foreground flex items-center gap-2 uppercase">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               University Verified Platform
             </Badge>
@@ -225,7 +242,7 @@ export default function LandingPage() {
                 placeholder="Search for lost items (e.g., 'Blue backpack')..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-32 h-14 md:h-16 rounded-full bg-card/60 border-white/10 text-base md:text-lg focus-visible:ring-primary shadow-2xl backdrop-blur-md"
+                className="pl-12 pr-32 h-14 md:h-16 rounded-full bg-card/60 border-border text-base md:text-lg focus-visible:ring-primary shadow-2xl backdrop-blur-md"
               />
               <Button type="submit" size="lg" className="absolute right-1.5 h-11 rounded-full px-6 md:px-8 text-base shadow-lg hover:bg-primary/90">
                 Search
@@ -236,22 +253,22 @@ export default function LandingPage() {
             {stats.total > 0 && (
               <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:gap-12 mt-10 text-center px-4">
                 <div className="min-w-[80px]">
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white"><AnimatedCounter end={stats.total} /></p>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground"><AnimatedCounter end={stats.total} /></p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Total Items</p>
                 </div>
-                <div className="hidden sm:block w-px h-8 bg-white/10" />
+                <div className="hidden sm:block w-px h-8 bg-secondary" />
                 <div className="min-w-[80px]">
                   <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-green-400"><AnimatedCounter end={stats.found} /></p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Found</p>
                 </div>
-                <div className="hidden sm:block w-px h-8 bg-white/10" />
+                <div className="hidden sm:block w-px h-8 bg-secondary" />
                 <div className="min-w-[80px]">
                   <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-red-400"><AnimatedCounter end={stats.lost} /></p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Lost</p>
                 </div>
                 {stats.returned >= 0 && (
                   <>
-                    <div className="hidden sm:block w-px h-8 bg-white/10" />
+                    <div className="hidden sm:block w-px h-8 bg-secondary" />
                     <div className="min-w-[80px]">
                       <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-blue-400"><AnimatedCounter end={stats.returned} /></p>
                       <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-1">Returned</p>
@@ -287,7 +304,7 @@ export default function LandingPage() {
               { icon: MessageSquare, bg: "bg-indigo-500/10", text: "text-indigo-500", title: "3. Secure Chat", desc: "Once a claim is verified by the item poster, our real-time messaging system opens up so you can coordinate the return seamlessly." },
               { icon: CheckCircle2, bg: "bg-green-500/10", text: "text-green-500", title: "4. Mark as Returned", desc: "After a successful return, the item poster must Mark the item as returned to close the case and notify everyone." },
             ].map(({ icon: Icon, bg, text, title, desc }) => (
-              <Card key={title} className="bg-card/40 border-white/5 backdrop-blur-sm shadow-xl p-8 hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center">
+              <Card key={title} className="bg-card/40 border-border backdrop-blur-sm shadow-xl p-8 hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center">
                 <div className={`h-12 w-12 rounded-xl ${bg} flex items-center justify-center mb-6`}>
                   <Icon className={`h-6 w-6 ${text}`} />
                 </div>
@@ -322,7 +339,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {itemsLoading ? (
               [...Array(4)].map((_, i) => (
-                <Card key={i} className="bg-card border-white/5 rounded-xl overflow-hidden">
+                <Card key={i} className="bg-card border-border rounded-xl overflow-hidden">
                   <Skeleton className="h-48 w-full rounded-none" />
                   <CardContent className="p-5">
                     <Skeleton className="h-5 w-3/4 mb-3" />
@@ -343,16 +360,16 @@ export default function LandingPage() {
                   ? `${reporter.firstName}${reporter.lastName ? " " + reporter.lastName[0] + "." : ""}`
                   : "Anonymous";
                 return (
-                  <Card key={item._id} className="bg-card overflow-hidden border-white/5 group flex flex-col h-full hover:border-white/10 hover:-translate-y-1 transition-all duration-300 shadow-lg rounded-xl">
+                  <Card key={item._id} className="bg-card overflow-hidden border-border group flex flex-col h-full hover:border-border hover:-translate-y-1 transition-all duration-300 shadow-lg rounded-xl">
                     <div className="h-48 bg-muted relative overflow-hidden">
                       {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="h-12 w-12 text-white/10" />
+                          <Package className="h-12 w-12 text-muted-foreground/30" />
                         </div>
                       )}
-                      <Badge className={`absolute top-3 left-3 border-none font-bold tracking-widest text-[10px] ${item.status === "Found" ? "bg-green-500 hover:bg-green-500 text-white" : "bg-red-500 hover:bg-red-500 text-white"}`}>
+                      <Badge className={`absolute top-3 left-3 border-none font-bold tracking-widest text-[10px] ${item.status === "Found" ? "bg-green-500 hover:bg-green-500 text-primary-foreground" : "bg-red-500 hover:bg-red-500 text-primary-foreground"}`}>
                         {item.status?.toUpperCase()}
                       </Badge>
                     </div>
@@ -384,14 +401,14 @@ export default function LandingPage() {
                       </div>
                       <SignedIn>
                         <Link to={`/item/${item._id}`}>
-                          <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-foreground font-semibold">
+                          <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary text-foreground font-semibold">
                             View Details
                           </Button>
                         </Link>
                       </SignedIn>
                       <SignedOut>
                         <SignInButton mode="modal">
-                          <Button variant="secondary" className="w-full bg-white/5 hover:bg-white/10 text-foreground font-semibold">
+                          <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary text-foreground font-semibold">
                             {item.status === "Found" ? "This is mine" : "I found this"}
                           </Button>
                         </SignInButton>
@@ -406,14 +423,14 @@ export default function LandingPage() {
           <div className="flex justify-center">
             <SignedIn>
               <Link to="/dashboard">
-                <Button variant="outline" className="border-white/10 bg-transparent text-white hover:bg-white/5 rounded-full px-8 gap-2">
+                <Button variant="outline" className="border-border bg-transparent text-foreground hover:bg-secondary rounded-full px-8 gap-2">
                   View All Items <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <Button variant="outline" className="border-white/10 bg-transparent text-white hover:bg-white/5 rounded-full px-8 gap-2">
+                <Button variant="outline" className="border-border bg-transparent text-foreground hover:bg-secondary rounded-full px-8 gap-2">
                   Sign In to View All <ArrowRight className="h-4 w-4" />
                 </Button>
               </SignInButton>
@@ -445,7 +462,7 @@ export default function LandingPage() {
                 </SignInButton>
               </SignedOut>
               <a href="#contact">
-                <Button size="lg" variant="outline" className="border-white/30 hover:bg-white/10 bg-transparent text-white font-bold px-8 rounded-xl h-12 md:h-14 text-md">
+                <Button size="lg" variant="outline" className="border-white/30 hover:bg-secondary bg-transparent text-foreground font-bold px-8 rounded-xl h-12 md:h-14 text-md">
                   Contact Support
                 </Button>
               </a>
@@ -455,12 +472,12 @@ export default function LandingPage() {
       </main>
 
       {/* Footer / Contact */}
-      <footer id="contact" className="border-t border-white/5 py-16 px-4 bg-background">
+      <footer id="contact" className="border-t border-border py-16 px-4 bg-background">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 mb-16">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <Box className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold tracking-tight text-white">CampusCrate</span>
+              <span className="text-lg font-bold tracking-tight text-foreground">CampusCrate</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs font-medium">
               Helping students reconnect with their belongings since 2026. Verified by University Administration.
@@ -468,26 +485,26 @@ export default function LandingPage() {
           </div>
 
           <div>
-            <h4 className="font-bold mb-4 text-white">Platform</h4>
+            <h4 className="font-bold mb-4 text-foreground">Platform</h4>
             <ul className="space-y-3 text-sm text-muted-foreground font-medium">
-              <li><a href="#recent-items" className="hover:text-white transition-colors">Browse Items</a></li>
+              <li><a href="#recent-items" className="hover:text-foreground transition-colors">Browse Items</a></li>
               <SignedIn>
-                <li><Link to="/report" className="hover:text-white transition-colors">Report Lost Item</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">My Dashboard</Link></li>
+                <li><Link to="/report" className="hover:text-foreground transition-colors">Report Lost Item</Link></li>
+                <li><Link to="/dashboard" className="hover:text-foreground transition-colors">My Dashboard</Link></li>
               </SignedIn>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold mb-4 text-white">Help</h4>
+            <h4 className="font-bold mb-4 text-foreground">Help</h4>
             <ul className="space-y-3 text-sm text-muted-foreground font-medium">
-              <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
-              <li><a href="#contact" className="hover:text-white transition-colors">Contact Us</a></li>
+              <li><a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a></li>
+              <li><a href="#contact" className="hover:text-foreground transition-colors">Contact Us</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold mb-4 text-white">Contact</h4>
+            <h4 className="font-bold mb-4 text-foreground">Contact</h4>
             <ul className="space-y-3 text-sm text-muted-foreground font-medium">
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" />  registrarsbssu@gmail.com</li>
               <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" /> 0187-4292879</li>
@@ -496,7 +513,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-muted-foreground">
+        <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-muted-foreground">
           <p>© {new Date().getFullYear()} CampusCrate. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link to="/admin/login" className="flex items-center gap-1.5 text-rose-500/60 hover:text-rose-400 transition-colors font-semibold">

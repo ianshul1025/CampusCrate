@@ -8,8 +8,9 @@ import {
   ShieldCheck, ShieldOff, Eye, EyeOff,
   Search, Package, AlertTriangle,
   UserCheck, UserX, Activity, X,
-  Flag, MessageSquareWarning, Menu, KeyRound
+  Flag, MessageSquareWarning, Menu, KeyRound, Sun, Moon
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -37,13 +38,13 @@ function StatCard({ label, value, icon: Icon, color, sub }) {
   return (
     <div className={`bg-gradient-to-br ${cls} border rounded-2xl p-5 flex flex-col gap-3`}>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-widest text-white/50">{label}</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-foreground/50">{label}</p>
         <div className="w-8 h-8 rounded-lg bg-current/10 flex items-center justify-center">
           <Icon className="w-4 h-4" />
         </div>
       </div>
-      <p className="text-3xl font-black text-white">{value ?? "—"}</p>
-      {sub && <p className="text-[11px] text-white/40 font-medium">{sub}</p>}
+      <p className="text-3xl font-black text-foreground">{value ?? "—"}</p>
+      {sub && <p className="text-[11px] text-foreground/40 font-medium">{sub}</p>}
     </div>
   );
 }
@@ -54,18 +55,18 @@ function ItemDetailModal({ item, onClose, onBlockUser, onDeleteItem }) {
   const reporter = item.reportedBy;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/70 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-full max-w-xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="w-full max-w-xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-white/8 bg-white/[0.03] shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-border bg-secondary shrink-0">
           <div className="min-w-0 pr-4">
-            <h2 className="text-base font-black text-white truncate">{item.title}</h2>
-            <p className="text-[11px] text-white/30 mt-0.5">ID: #{item._id?.slice(-10).toUpperCase()}</p>
+            <h2 className="text-base font-black text-foreground truncate">{item.title}</h2>
+            <p className="text-[11px] text-muted-foreground/50 mt-0.5">ID: #{item._id?.slice(-10).toUpperCase()}</p>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors p-1.5 hover:bg-white/5 rounded-xl shrink-0">
+          <button onClick={onClose} className="text-muted-foreground/50 hover:text-foreground transition-colors p-1.5 hover:bg-secondary rounded-xl shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -73,14 +74,14 @@ function ItemDetailModal({ item, onClose, onBlockUser, onDeleteItem }) {
         {/* Scrollable Body */}
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           {item.imageUrl && (
-            <div className="h-48 bg-black flex items-center justify-center shrink-0">
+            <div className="h-48 bg-card flex items-center justify-center shrink-0">
               <img src={item.imageUrl} alt={item.title} className="h-full w-full object-contain" />
             </div>
           )}
           {!item.imageUrl && (
-            <div className="h-28 bg-white/[0.02] flex items-center justify-center border-b border-white/5">
-              <Package className="w-8 h-8 text-white/10" />
-              <p className="text-xs text-white/20 ml-2 font-medium">No image uploaded</p>
+            <div className="h-28 bg-secondary flex items-center justify-center border-b border-border">
+              <Package className="w-8 h-8 text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground/50 ml-2 font-medium">No image uploaded</p>
             </div>
           )}
 
@@ -95,23 +96,23 @@ function ItemDetailModal({ item, onClose, onBlockUser, onDeleteItem }) {
               ["Reporter",      reporter?.firstName ? `${reporter.firstName} ${reporter.lastName || ""}` : "Anonymous"],
               ["Reporter Email",reporter?.email || "N/A"],
             ].map(([k, v]) => (
-              <div key={k} className="bg-white/[0.04] rounded-xl p-3 border border-white/5">
-                <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">{k}</p>
-                <p className="font-semibold text-white/80 text-sm truncate">{v}</p>
+              <div key={k} className="bg-secondary rounded-xl p-3 border border-border">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-1">{k}</p>
+                <p className="font-semibold text-muted-foreground text-sm truncate">{v}</p>
               </div>
             ))}
 
             {item.description && (
-              <div className="col-span-2 bg-white/[0.04] rounded-xl p-3 border border-white/5">
-                <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">Description</p>
-                <p className="font-medium text-white/70 text-sm leading-relaxed">{item.description}</p>
+              <div className="col-span-2 bg-secondary rounded-xl p-3 border border-border">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-1">Description</p>
+                <p className="font-medium text-muted-foreground text-sm leading-relaxed">{item.description}</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Action Footer */}
-        <div className="p-4 border-t border-white/8 shrink-0 flex gap-3 bg-white/[0.02]">
+        <div className="p-4 border-t border-border shrink-0 flex gap-3 bg-secondary">
           <button
             className={`flex-1 flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-colors border ${
               reporter?.blocked
@@ -124,7 +125,7 @@ function ItemDetailModal({ item, onClose, onBlockUser, onDeleteItem }) {
             {reporter?.blocked ? <><ShieldCheck className="w-4 h-4" /> Unblock User</> : <><Ban className="w-4 h-4" /> Block User</>}
           </button>
           <button
-            className="flex-1 flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground/60 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400 transition-colors"
             onClick={() => onDeleteItem(item._id)}
           >
             <Trash2 className="w-4 h-4" /> Delete Item
@@ -142,22 +143,22 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
   const reasonColors = { scam: "bg-red-500/20 text-red-400", fraud: "bg-orange-500/20 text-orange-400", harassment: "bg-rose-500/20 text-rose-400", spam: "bg-yellow-500/20 text-yellow-400", irrelevant: "bg-slate-500/20 text-slate-400", other: "bg-slate-500/20 text-slate-400" };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/70 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+        className="w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-white/8 bg-white/[0.03] shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-border bg-secondary shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center">
               <Flag className="w-4 h-4 text-red-400" />
             </div>
             <div>
-              <p className="text-sm font-black text-white">User Complaint</p>
-              <p className="text-[11px] text-white/30">#{report._id?.slice(-8).toUpperCase()}</p>
+              <p className="text-sm font-black text-foreground">User Complaint</p>
+              <p className="text-[11px] text-muted-foreground/50">#{report._id?.slice(-8).toUpperCase()}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors p-1.5 hover:bg-white/5 rounded-xl">
+          <button onClick={onClose} className="text-muted-foreground/50 hover:text-foreground transition-colors p-1.5 hover:bg-secondary rounded-xl">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -165,7 +166,7 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
         <div className="overflow-y-auto flex-1 custom-scrollbar p-5 space-y-4">
           {/* Reason */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Reason</span>
+            <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest">Reason</span>
             <span className={`text-xs font-black px-3 py-1 rounded-full ${reasonColors[report.reason] || "bg-slate-500/20 text-slate-400"}`}>
               {reasonLabels[report.reason] || report.reason}
             </span>
@@ -173,8 +174,8 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
 
           {/* Parties */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-2">Reported By</p>
+            <div className="bg-secondary rounded-xl p-3 border border-border">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-2">Reported By</p>
               <div className="flex items-center gap-2">
                 <Avatar className="h-7 w-7 rounded-lg">
                   <AvatarImage src={report.reportedBy?.avatar} />
@@ -183,14 +184,14 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-bold text-white">{report.reportedBy?.firstName} {report.reportedBy?.lastName || ""}</p>
-                  <p className="text-[10px] text-white/30 truncate">{report.reportedBy?.email}</p>
+                  <p className="text-sm font-bold text-foreground">{report.reportedBy?.firstName} {report.reportedBy?.lastName || ""}</p>
+                  <p className="text-[10px] text-muted-foreground/50 truncate">{report.reportedBy?.email}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/[0.04] rounded-xl p-3 border border-red-500/10">
-              <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-2">Reported User</p>
+            <div className="bg-secondary rounded-xl p-3 border border-red-500/10">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-2">Reported User</p>
               <div className="flex items-center gap-2">
                 <Avatar className="h-7 w-7 rounded-lg">
                   <AvatarImage src={report.reportedUser?.avatar} />
@@ -199,8 +200,8 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-bold text-white">{report.reportedUser?.firstName} {report.reportedUser?.lastName || ""}</p>
-                  <p className="text-[10px] text-white/30 truncate">{report.reportedUser?.email}</p>
+                  <p className="text-sm font-bold text-foreground">{report.reportedUser?.firstName} {report.reportedUser?.lastName || ""}</p>
+                  <p className="text-[10px] text-muted-foreground/50 truncate">{report.reportedUser?.email}</p>
                   {report.reportedUser?.blocked && <span className="text-[9px] font-black text-red-400">BLOCKED</span>}
                 </div>
               </div>
@@ -209,38 +210,38 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
 
           {/* Related Item */}
           {report.item && (
-            <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">Related Item</p>
-              <p className="text-sm font-semibold text-white/80">{report.item?.title || "—"}</p>
-              {report.item?.category && <p className="text-[11px] text-white/30 mt-0.5 capitalize">{report.item.category}</p>}
+            <div className="bg-secondary rounded-xl p-3 border border-border">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-1">Related Item</p>
+              <p className="text-sm font-semibold text-muted-foreground">{report.item?.title || "—"}</p>
+              {report.item?.category && <p className="text-[11px] text-muted-foreground/50 mt-0.5 capitalize">{report.item.category}</p>}
             </div>
           )}
 
           {/* Details / Chat Transcript */}
           {report.lastFiveMessages && report.lastFiveMessages.length > 0 ? (
-             <div className="bg-[#111b21] rounded-xl border border-white/5 overflow-hidden flex flex-col">
-              <div className="bg-[#202c33] p-3 flex items-center justify-between border-b border-white/5">
-                <p className="text-xs font-bold text-[#e9edef] uppercase tracking-widest flex items-center gap-2">
-                  <MessageSquareWarning className="w-4 h-4 text-[#00a884]" />
+             <div className="bg-card rounded-xl border border-border overflow-hidden flex flex-col">
+              <div className="bg-secondary p-3 flex items-center justify-between border-b border-border">
+                <p className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                  <MessageSquareWarning className="w-4 h-4 text-emerald-500" />
                   Chat Transcript Snapshot
                 </p>
-                <Badge className="bg-[#00a884]/20 text-[#00a884] border-0 text-[9px] font-black">{report.lastFiveMessages.length} Messages</Badge>
+                <Badge className="bg-emerald-500/20 text-emerald-500 border-0 text-[9px] font-black">{report.lastFiveMessages.length} Messages</Badge>
               </div>
-              <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar bg-[#0b141a]">
+              <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar bg-background">
                 {report.lastFiveMessages.map((msg, i) => {
                   const isReportedUser = msg.senderId === report.reportedUser?._id;
                   return (
                     <div key={i} className={`flex ${isReportedUser ? "justify-start" : "justify-end"}`}>
                       <div className={`max-w-[75%] rounded-lg px-3 py-2 text-[13px] leading-relaxed shadow-sm ${
                         isReportedUser 
-                          ? "bg-[#202c33] text-[#e9edef] rounded-tl-none border border-white/5" 
-                          : "bg-[#005c4b] text-[#e9edef] rounded-tr-none"
+                          ? "bg-secondary text-foreground rounded-tl-none border border-border" 
+                          : "bg-[#005c4b] text-foreground rounded-tr-none"
                       }`}>
-                        <p className={`text-[10px] font-bold mb-1 ${isReportedUser ? "text-red-400" : "text-[#00a884]"}`}>
+                        <p className={`text-[10px] font-bold mb-1 ${isReportedUser ? "text-red-400" : "text-emerald-500"}`}>
                           {msg.senderName} {isReportedUser ? "(Reported)" : "(Reporter)"}
                         </p>
                         <p className="break-words">{msg.message}</p>
-                        <p className="text-[9px] text-[#8696a0] text-right mt-1">
+                        <p className="text-[9px] text-muted-foreground text-right mt-1">
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
@@ -250,20 +251,20 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
               </div>
             </div>
           ) : report.description ? (
-            <div className="bg-white/[0.04] rounded-xl p-3 border border-white/5">
-              <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">Details</p>
-              <p className="text-sm text-white/70 leading-relaxed">
+            <div className="bg-secondary rounded-xl p-3 border border-border">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-1">Details</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {report.description === "Report specific to chat behavior." ? "No chat available" : report.description}
               </p>
             </div>
           ) : null}
 
-          <div className="text-[11px] text-white/20 font-medium">
+          <div className="text-[11px] text-muted-foreground/50 font-medium">
             Filed: {new Date(report.createdAt).toLocaleString("en-IN")}
           </div>
         </div>
 
-        <div className="p-4 border-t border-white/8 bg-white/[0.02] shrink-0 flex gap-3">
+        <div className="p-4 border-t border-border bg-secondary shrink-0 flex gap-3">
           <button
             className={`flex-1 flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-colors border ${
               report.reportedUser?.blocked
@@ -277,7 +278,7 @@ function ComplaintDetailModal({ report, onClose, onBlockUser, onDismiss }) {
           </button>
           {report.status === "pending" && (
             <button
-              className="flex-1 flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground/50 hover:bg-secondary transition-colors"
               onClick={() => onDismiss(report._id)}
             >
               <CheckCircle className="w-4 h-4" /> Dismiss
@@ -308,45 +309,45 @@ function UserDetailModal({ user, onClose, onBlockUser }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/70 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+        className="w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-white/8 bg-white/[0.03] shrink-0">
+        <div className="flex items-center justify-between p-6 border-b border-border bg-secondary shrink-0">
           <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 rounded-xl border border-white/10">
+            <Avatar className="h-12 w-12 rounded-xl border border-border">
               <AvatarImage src={user.avatar} />
               <AvatarFallback className="bg-primary/20 text-primary font-black text-lg">
                 {user.firstName?.[0]?.toUpperCase() || "?"}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-xl font-black text-white">{user.firstName} {user.lastName || ""}</h2>
-              <p className="text-xs text-white/30 lowercase">Member since {new Date(user.createdAt).getFullYear()}</p>
+              <h2 className="text-xl font-black text-foreground">{user.firstName} {user.lastName || ""}</h2>
+              <p className="text-xs text-muted-foreground/50 lowercase">Member since {new Date(user.createdAt).getFullYear()}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors p-1.5 hover:bg-white/5 rounded-xl">
+          <button onClick={onClose} className="text-muted-foreground/50 hover:text-foreground transition-colors p-1.5 hover:bg-secondary rounded-xl">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1 custom-scrollbar p-6 grid grid-cols-2 gap-4">
           {profileFields.map((f, i) => (
-            <div key={i} className={`bg-white/[0.04] rounded-xl p-3 border border-white/5 ${f.label === "Email" || f.label === "ID" ? "col-span-2" : ""}`}>
-              <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">{f.label}</p>
+            <div key={i} className={`bg-secondary rounded-xl p-3 border border-border ${f.label === "Email" || f.label === "ID" ? "col-span-2" : ""}`}>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-bold mb-1">{f.label}</p>
               {f.badge ? (
                 <Badge className={`text-[11px] font-black border-0 capitalize ${f.color === "red" ? "bg-red-500/20 text-red-400" : f.color === "green" ? "bg-green-500/20 text-green-400" : "bg-primary/20 text-primary"}`}>
                   {f.value}
                 </Badge>
               ) : (
-                <p className="font-semibold text-white/80 text-sm truncate">{f.value}</p>
+                <p className="font-semibold text-muted-foreground text-sm truncate">{f.value}</p>
               )}
             </div>
           ))}
         </div>
 
-        <div className="p-4 border-t border-white/8 bg-white/[0.02] shrink-0">
+        <div className="p-4 border-t border-border bg-secondary shrink-0">
           {user.role !== "admin" && (
             <button
               className={`w-full flex items-center justify-center gap-2 text-sm font-bold px-4 py-3 rounded-xl transition-colors border ${
@@ -399,6 +400,13 @@ export default function AdminDashboard() {
     newPassword: false,
     confirmPassword: false,
   });
+
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (section === "reports") setClearedReportsBadge(true);
@@ -542,44 +550,54 @@ export default function AdminDashboard() {
   if (!isAdminAuth) return null;
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-950 text-white font-sans flex flex-col">
+    <div className="h-screen overflow-hidden bg-background text-foreground font-sans flex flex-col">
 
       {/* Top Bar */}
-      <header className="flex items-center justify-between px-3 sm:px-6 py-3 border-b border-white/[0.06] bg-slate-900/80 backdrop-blur-md shrink-0 z-40">
+      <header className="flex items-center justify-between px-3 sm:px-6 py-3 border-b border-border bg-background/80 backdrop-blur-md shrink-0 z-40">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
-            className="lg:hidden w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-white/70"
+            className="lg:hidden w-8 h-8 rounded-lg border border-border bg-secondary flex items-center justify-center text-muted-foreground"
             aria-label="Open admin navigation"
           >
             <Menu className="w-4 h-4" />
           </button>
           <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center shadow-lg shadow-rose-900/40">
-            <ShieldCheck className="w-4 h-4 text-white" />
+            <ShieldCheck className="w-4 h-4 text-foreground" />
           </div>
           <div>
-            <p className="text-sm font-black tracking-tight text-white">Admin Console</p>
-            <p className="text-[10px] text-white/30 font-medium">CampusCrate</p>
+            <p className="text-sm font-black tracking-tight text-foreground">Admin Console</p>
+            <p className="text-[10px] text-muted-foreground/50 font-medium">CampusCrate</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {mounted && (
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/50 hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">Theme</span>
+            </button>
+          )}
           <button
             onClick={() => setPasswordModalOpen(true)}
-            className="flex items-center gap-1.5 text-xs font-bold text-white/30 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/50 hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
             aria-label="Update admin credentials"
           >
             <KeyRound className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Change Password</span>
           </button>
           <button onClick={fetchAll} disabled={loading}
-            className="flex items-center gap-1.5 text-xs font-bold text-white/30 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/50 hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
             aria-label="Refresh admin data"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
-          <Link to="/" target="_blank" rel="noopener noreferrer" className="hidden sm:block text-xs font-bold text-white/20 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+          <Link to="/" target="_blank" rel="noopener noreferrer" className="hidden sm:block text-xs font-bold text-muted-foreground/50 hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary">
             View App
           </Link>
           <button onClick={handleLogout}
@@ -591,34 +609,34 @@ export default function AdminDashboard() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-52 shrink-0 hidden lg:flex flex-col bg-slate-900/50 border-r border-white/[0.05] overflow-y-auto custom-scrollbar">
+        <aside className="w-52 shrink-0 hidden lg:flex flex-col bg-secondary/50 border-r border-border overflow-y-auto custom-scrollbar">
           <nav className="flex-1 p-3 space-y-1 pt-4">
             {navItems.map(({ id, label, icon: Icon, badge }) => (
               <button key={id} onClick={() => setSection(id)}
                 className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 ${
                   section === id
                     ? "bg-rose-600/20 text-rose-400 border border-rose-500/30"
-                    : "text-white/40 hover:text-white hover:bg-white/5 border border-transparent"
+                    : "text-foreground/40 hover:text-foreground hover:bg-secondary border border-transparent"
                 }`}>
                 <span className="flex items-center gap-3">
                   <Icon className="w-4 h-4 shrink-0" /> {label}
                 </span>
                 {badge != null && badge > 0 && (
-                  <span className="text-[10px] font-black bg-rose-500 text-white rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                  <span className="text-[10px] font-black bg-rose-500 text-foreground rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
                     {badge}
                   </span>
                 )}
               </button>
             ))}
           </nav>
-          <div className="p-4 border-t border-white/5">
+          <div className="p-4 border-t border-border">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-rose-600/30 flex items-center justify-center shrink-0">
                 <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
               </div>
               <div>
-                <p className="text-xs font-black text-white/70">Super Admin</p>
-                <p className="text-[10px] text-white/30">Full Access</p>
+                <p className="text-xs font-black text-muted-foreground">Super Admin</p>
+                <p className="text-[10px] text-muted-foreground/50">Full Access</p>
               </div>
             </div>
           </div>
@@ -631,13 +649,13 @@ export default function AdminDashboard() {
           {section === "dashboard" && (
             <>
               <div>
-                <h1 className="text-2xl font-black tracking-tight text-white">Moderation Dashboard</h1>
-                <p className="text-sm text-white/40 mt-1">Real-time overview of platform activity and content.</p>
+                <h1 className="text-2xl font-black tracking-tight text-foreground">Moderation Dashboard</h1>
+                <p className="text-sm text-foreground/40 mt-1">Real-time overview of platform activity and content.</p>
               </div>
 
               {loading ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {[...Array(9)].map((_, i) => <div key={i} className="h-28 rounded-2xl bg-white/5 animate-pulse" />)}
+                  {[...Array(9)].map((_, i) => <div key={i} className="h-28 rounded-2xl bg-secondary animate-pulse" />)}
                 </div>
               ) : analytics && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -657,44 +675,44 @@ export default function AdminDashboard() {
               )}
 
               {/* Moderation Queue Table */}
-              <div className="bg-slate-900/60 border border-white/[0.06] rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between p-5 border-b border-border">
                   <div>
-                    <h2 className="font-black text-white">Moderation Queue</h2>
-                    <p className="text-xs text-white/30 mt-0.5">All item submissions — view, block or delete</p>
+                    <h2 className="font-black text-foreground">Moderation Queue</h2>
+                    <p className="text-xs text-muted-foreground/50 mt-0.5">All item submissions — view, block or delete</p>
                   </div>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50" />
                     <Input placeholder="Search items..." value={search} onChange={e => setSearch(e.target.value)}
-                      className="h-8 pl-8 w-48 bg-white/5 border-white/10 rounded-lg text-xs text-white placeholder:text-white/20" />
+                      className="h-8 pl-8 w-48 bg-secondary border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground/50" />
                   </div>
                 </div>
 
                 <div className="overflow-x-auto">
                   <div className="min-w-[860px]">
-                    <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
+                    <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/25 border-b border-border">
                       <span>Item Name</span><span>Submitter</span><span>Date</span><span>Status</span><span>State</span><span>Actions</span>
                     </div>
 
-                    <div className="divide-y divide-white/[0.04]">
+                    <div className="divide-y divide-border">
                       {loading ? (
-                        [...Array(5)].map((_, i) => <div key={i} className="h-16 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
+                        [...Array(5)].map((_, i) => <div key={i} className="h-16 mx-5 my-2 rounded-xl bg-secondary animate-pulse" />)
                       ) : filteredItems.length === 0 ? (
-                        <div className="py-16 text-center text-white/20">
+                        <div className="py-16 text-center text-muted-foreground/50">
                           <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
                           <p className="font-bold">No items found</p>
                         </div>
                       ) : filteredItems.map(item => (
-                        <div key={item._id} className={`grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-4 items-center hover:bg-white/[0.02] transition-colors ${item.reportedBy?.blocked ? "bg-red-500/[0.04]" : ""}`}>
+                        <div key={item._id} className={`grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr_auto] gap-4 px-5 py-4 items-center hover:bg-secondary transition-colors ${item.reportedBy?.blocked ? "bg-red-500/[0.04]" : ""}`}>
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/5 shrink-0 flex items-center justify-center border border-white/5">
+                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center border border-border">
                           {item.imageUrl
                             ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
-                            : <Package className="w-4 h-4 text-white/20" />}
+                            : <Package className="w-4 h-4 text-muted-foreground/50" />}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-sm text-white truncate">{item.title}</p>
-                          <p className="text-[11px] text-white/25 truncate">{item.location || item.category}</p>
+                          <p className="font-bold text-sm text-foreground truncate">{item.title}</p>
+                          <p className="text-[11px] text-foreground/25 truncate">{item.location || item.category}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
@@ -705,20 +723,20 @@ export default function AdminDashboard() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-white/70 truncate">
+                          <p className="text-xs font-semibold text-muted-foreground truncate">
                             {item.reportedBy?.firstName || "Anonymous"} {item.reportedBy?.lastName || ""}
                           </p>
                           {item.reportedBy?.blocked && <span className="text-[9px] font-black text-red-400">BLOCKED</span>}
                         </div>
                       </div>
-                      <span className="text-xs text-white/30 font-medium">
+                      <span className="text-xs text-muted-foreground/50 font-medium">
                         {item.createdAt ? new Date(item.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" }) : "—"}
                       </span>
                       <Badge className={`text-[10px] font-black border-0 w-fit ${item.status === "Lost" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}>{item.status}</Badge>
                       <Badge className={`text-[10px] font-black border-0 capitalize w-fit ${item.state === "returned" ? "bg-blue-500/20 text-blue-400" : "bg-yellow-500/15 text-yellow-400"}`}>{item.state || "active"}</Badge>
                       <div className="flex items-center gap-1.5">
                         <button onClick={() => setSelectedItem(item)} title="View Details"
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white flex items-center justify-center transition-colors">
+                          className="w-7 h-7 rounded-lg bg-secondary hover:bg-secondary text-foreground/40 hover:text-foreground flex items-center justify-center transition-colors">
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                         <button onClick={() => setDeleteConfirm(item._id)} title="Delete"
@@ -740,7 +758,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 {filteredItems.length > 0 && (
-                  <div className="px-5 py-3 border-t border-white/[0.04] text-xs text-white/20 font-medium">
+                  <div className="px-5 py-3 border-t border-border text-xs text-muted-foreground/50 font-medium">
                     Showing {filteredItems.length} of {items.length} items
                   </div>
                 )}
@@ -752,15 +770,15 @@ export default function AdminDashboard() {
           {section === "reports" && (
             <>
               <div>
-                <h1 className="text-2xl font-black tracking-tight text-white">User Complaints</h1>
-                <p className="text-sm text-white/40 mt-1">Reports filed by users regarding scam, fraud, or irrelevant behaviour during chat.</p>
+                <h1 className="text-2xl font-black tracking-tight text-foreground">User Complaints</h1>
+                <p className="text-sm text-foreground/40 mt-1">Reports filed by users regarding scam, fraud, or irrelevant behaviour during chat.</p>
               </div>
 
-              <div className="bg-slate-900/60 border border-white/[0.06] rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between p-5 border-b border-border">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-white">{reports.length} Total Complaints</span>
-                    <span className="text-xs text-white/20">·</span>
+                    <span className="text-sm font-bold text-foreground">{reports.length} Total Complaints</span>
+                    <span className="text-xs text-muted-foreground/50">·</span>
                     <span className="text-xs font-bold text-red-400">{reports.filter(r => r.status === "pending").length} Pending</span>
                   </div>
                 </div>
@@ -768,15 +786,15 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <div className="min-w-[860px]">
                 {/* Table Head */}
-                    <div className="grid grid-cols-[40px_1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-3 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
+                    <div className="grid grid-cols-[40px_1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-3 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/25 border-b border-border">
                       <span>#</span><span>Reported User</span><span>Reported By</span><span>Reason</span><span>Status</span><span>Date & Time</span><span>Action</span>
                     </div>
 
-                    <div className="divide-y divide-white/[0.04]">
+                    <div className="divide-y divide-border">
                   {loading ? (
-                    [...Array(5)].map((_, i) => <div key={i} className="h-14 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
+                    [...Array(5)].map((_, i) => <div key={i} className="h-14 mx-5 my-2 rounded-xl bg-secondary animate-pulse" />)
                   ) : reports.length === 0 ? (
-                    <div className="py-16 text-center text-white/20">
+                    <div className="py-16 text-center text-muted-foreground/50">
                       <MessageSquareWarning className="w-10 h-10 mx-auto mb-3 opacity-30" />
                       <p className="font-bold">No complaints filed yet</p>
                       <p className="text-xs mt-1">User reports made during chat will appear here</p>
@@ -784,8 +802,8 @@ export default function AdminDashboard() {
                   ) : reports.map((report, idx) => {
                     const reasonColors = { scam: "bg-red-500/20 text-red-400", fraud: "bg-orange-500/20 text-orange-400", harassment: "bg-rose-500/20 text-rose-400", spam: "bg-yellow-500/20 text-yellow-400", irrelevant: "bg-slate-500/20 text-slate-300", other: "bg-slate-500/20 text-slate-300" };
                     return (
-                      <div key={report._id} className={`grid grid-cols-[40px_1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-white/[0.02] transition-colors ${report.status === "pending" ? "" : "opacity-60"}`}>
-                        <span className="text-xs text-white/20 font-mono">{idx + 1}</span>
+                      <div key={report._id} className={`grid grid-cols-[40px_1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-3 px-5 py-3.5 items-center hover:bg-secondary transition-colors ${report.status === "pending" ? "" : "opacity-60"}`}>
+                        <span className="text-xs text-muted-foreground/50 font-mono">{idx + 1}</span>
 
                         <div className="flex items-center gap-2 min-w-0">
                           <Avatar className="h-6 w-6 rounded-md shrink-0">
@@ -795,7 +813,7 @@ export default function AdminDashboard() {
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="text-xs font-bold text-white/80 truncate">
+                            <p className="text-xs font-bold text-muted-foreground truncate">
                               {report.reportedUser?.firstName || "Unknown"} {report.reportedUser?.lastName || ""}
                             </p>
                             {report.reportedUser?.blocked && <span className="text-[9px] text-red-400 font-black">BLOCKED</span>}
@@ -809,7 +827,7 @@ export default function AdminDashboard() {
                               {report.reportedBy?.firstName?.[0]?.toUpperCase() || "?"}
                             </AvatarFallback>
                           </Avatar>
-                          <p className="text-xs text-white/50 truncate">{report.reportedBy?.firstName || "Anon"} {report.reportedBy?.lastName || ""}</p>
+                          <p className="text-xs text-foreground/50 truncate">{report.reportedBy?.firstName || "Anon"} {report.reportedBy?.lastName || ""}</p>
                         </div>
 
                         <span className={`text-[10px] font-black px-2 py-1 rounded-full w-fit capitalize ${reasonColors[report.reason] || "bg-slate-500/20 text-slate-300"}`}>
@@ -819,10 +837,10 @@ export default function AdminDashboard() {
                         <span>
                           {report.status === "pending" && <Badge className="text-[10px] font-black border-0 bg-yellow-500/20 text-yellow-400">Pending</Badge>}
                           {report.status === "reviewed" && <Badge className="text-[10px] font-black border-0 bg-blue-500/20 text-blue-400">Resolved</Badge>}
-                          {report.status === "dismissed" && <Badge className="text-[10px] font-black border-0 bg-white/10 text-white/40">Dismissed</Badge>}
+                          {report.status === "dismissed" && <Badge className="text-[10px] font-black border-0 bg-secondary text-foreground/40">Dismissed</Badge>}
                         </span>
 
-                        <span className="text-xs text-white/30 font-medium">
+                        <span className="text-xs text-muted-foreground/50 font-medium">
                           {new Date(report.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
                         </span>
 
@@ -845,46 +863,46 @@ export default function AdminDashboard() {
           {section === "users" && (
             <>
               <div>
-                <h1 className="text-2xl font-black tracking-tight text-white">Users</h1>
-                <p className="text-sm text-white/40 mt-1">All registered platform users, sorted alphabetically.</p>
+                <h1 className="text-2xl font-black tracking-tight text-foreground">Users</h1>
+                <p className="text-sm text-foreground/40 mt-1">All registered platform users, sorted alphabetically.</p>
               </div>
 
-              <div className="bg-slate-900/60 border border-white/[0.06] rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between p-5 border-b border-border">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-white">{users.length} Users</span>
-                    <span className="text-xs text-white/20">·</span>
+                    <span className="text-sm font-bold text-foreground">{users.length} Users</span>
+                    <span className="text-xs text-muted-foreground/50">·</span>
                     <span className="text-xs font-bold text-red-400">{users.filter(u => u.blocked).length} Blocked</span>
                   </div>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50" />
                     <Input placeholder="Search users..." value={userSearch} onChange={e => setUserSearch(e.target.value)}
-                      className="h-8 pl-8 w-52 bg-white/5 border-white/10 rounded-lg text-xs text-white placeholder:text-white/20" />
+                      className="h-8 pl-8 w-52 bg-secondary border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground/50" />
                   </div>
                 </div>
 
                 <div className="overflow-x-auto">
                   <div className="min-w-[780px]">
                 {/* Table Head — serial number instead of ID */}
-                    <div className="grid grid-cols-[50px_2fr_2.5fr_80px_100px_120px] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white/25 border-b border-white/[0.04]">
+                    <div className="grid grid-cols-[50px_2fr_2.5fr_80px_100px_120px] gap-4 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/25 border-b border-border">
                       <span>S.No</span><span>Name</span><span>Email</span><span>Role</span><span>Status</span><span>Action</span>
                     </div>
 
-                    <div className="divide-y divide-white/[0.04]">
+                    <div className="divide-y divide-border">
                   {loading ? (
-                    [...Array(8)].map((_, i) => <div key={i} className="h-14 mx-5 my-2 rounded-xl bg-white/5 animate-pulse" />)
+                    [...Array(8)].map((_, i) => <div key={i} className="h-14 mx-5 my-2 rounded-xl bg-secondary animate-pulse" />)
                   ) : filteredUsers.length === 0 ? (
-                    <div className="py-16 text-center text-white/20">
+                    <div className="py-16 text-center text-muted-foreground/50">
                       <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
                       <p className="font-bold">No users found</p>
                     </div>
                   ) : filteredUsers.map((user, idx) => (
-                    <div key={user._id} className={`grid grid-cols-[50px_2fr_2.5fr_80px_100px_120px] gap-4 px-5 py-3.5 items-center hover:bg-white/[0.02] transition-colors ${user.blocked ? "bg-red-500/[0.04]" : ""}`}>
+                    <div key={user._id} className={`grid grid-cols-[50px_2fr_2.5fr_80px_100px_120px] gap-4 px-5 py-3.5 items-center hover:bg-secondary transition-colors ${user.blocked ? "bg-red-500/[0.04]" : ""}`}>
                       {/* Serial Number */}
-                      <span className="text-sm font-black text-white/20">{idx + 1}</span>
+                      <span className="text-sm font-black text-muted-foreground/50">{idx + 1}</span>
 
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Avatar className="h-7 w-7 rounded-lg shrink-0 border border-white/10">
+                        <Avatar className="h-7 w-7 rounded-lg shrink-0 border border-border">
                           <AvatarImage src={user.avatar} />
                           <AvatarFallback className="text-[10px] bg-primary/20 text-primary font-black rounded-lg">
                             {user.firstName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "?"}
@@ -892,16 +910,16 @@ export default function AdminDashboard() {
                         </Avatar>
                         <div className="min-w-0">
                           <p 
-                            className="text-sm font-bold text-white truncate hover:text-rose-400 cursor-pointer transition-colors"
+                            className="text-sm font-bold text-foreground truncate hover:text-rose-400 cursor-pointer transition-colors"
                             onClick={() => setSelectedUser(user)}
                           >
                             {user.firstName || ""} {user.lastName || ""}
                           </p>
-                          {user.urn && <p className="text-[10px] text-white/30">URN: {user.urn}</p>}
+                          {user.urn && <p className="text-[10px] text-muted-foreground/50">URN: {user.urn}</p>}
                         </div>
                       </div>
 
-                      <span className="text-xs text-white/50 truncate font-medium">{user.email}</span>
+                      <span className="text-xs text-foreground/50 truncate font-medium">{user.email}</span>
 
                       <Badge className="text-[10px] font-black border-0 bg-primary/15 text-primary capitalize w-fit">
                         {user.role}
@@ -925,7 +943,7 @@ export default function AdminDashboard() {
                             : <><Ban className="w-3 h-3" /> Block</>}
                         </button>
                       ) : (
-                        <span className="text-[10px] text-white/20 font-medium">System</span>
+                        <span className="text-[10px] text-muted-foreground/50 font-medium">System</span>
                       )}
                     </div>
                   ))}
@@ -941,16 +959,16 @@ export default function AdminDashboard() {
       {mobileNavOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-card"
             onClick={() => setMobileNavOpen(false)}
             aria-label="Close admin navigation"
           />
-          <aside className="absolute left-0 top-0 h-full w-64 bg-slate-900 border-r border-white/[0.08] flex flex-col">
-            <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
-              <p className="text-sm font-black text-white">Admin Console</p>
+          <aside className="absolute left-0 top-0 h-full w-64 bg-card border-r border-border flex flex-col">
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <p className="text-sm font-black text-foreground">Admin Console</p>
               <button
                 onClick={() => setMobileNavOpen(false)}
-                className="w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-white/60"
+                className="w-8 h-8 rounded-lg border border-border bg-secondary flex items-center justify-center text-foreground/60"
                 aria-label="Close menu"
               >
                 <X className="w-4 h-4" />
@@ -962,13 +980,13 @@ export default function AdminDashboard() {
                   className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 ${
                     section === id
                       ? "bg-rose-600/20 text-rose-400 border border-rose-500/30"
-                      : "text-white/40 hover:text-white hover:bg-white/5 border border-transparent"
+                      : "text-foreground/40 hover:text-foreground hover:bg-secondary border border-transparent"
                   }`}>
                   <span className="flex items-center gap-3">
                     <Icon className="w-4 h-4 shrink-0" /> {label}
                   </span>
                   {badge != null && badge > 0 && (
-                    <span className="text-[10px] font-black bg-rose-500 text-white rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                    <span className="text-[10px] font-black bg-rose-500 text-foreground rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
                       {badge}
                     </span>
                   )}
@@ -1010,23 +1028,23 @@ export default function AdminDashboard() {
 
       {/* Block / Unblock Confirm */}
       <AlertDialog open={!!blockConfirm} onOpenChange={v => !v && setBlockConfirm(null)}>
-        <AlertDialogContent className="bg-slate-900 border-white/10 text-white rounded-2xl max-w-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-3 text-lg font-black">
               {blockConfirm?.isBlocked ? <ShieldCheck className="w-6 h-6 text-green-400" /> : <Ban className="w-6 h-6 text-red-400" />}
               {blockConfirm?.isBlocked ? "Unblock User?" : "Block User?"}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/40 mt-2 text-sm leading-relaxed">
+            <AlertDialogDescription className="text-foreground/40 mt-2 text-sm leading-relaxed">
               {blockConfirm?.isBlocked
                 ? `"${blockConfirm?.name}" will regain full access. Their items will become visible again.`
                 : `"${blockConfirm?.name}" will be immediately blocked, forcefully logged out, and unable to access the platform.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 mt-4">
-            <AlertDialogCancel className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl border-border bg-secondary hover:bg-secondary text-foreground font-bold">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => handleBlockUser(blockConfirm.userId, blockConfirm.name, blockConfirm.isBlocked)}
-              className={`rounded-xl font-bold border-0 ${blockConfirm?.isBlocked ? "bg-green-600 hover:bg-green-500" : "bg-red-600 hover:bg-red-500"} text-white`}>
+              className={`rounded-xl font-bold border-0 ${blockConfirm?.isBlocked ? "bg-green-600 hover:bg-green-500" : "bg-red-600 hover:bg-red-500"} text-foreground`}>
               Confirm {blockConfirm?.isBlocked ? "Unblock" : "Block"}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1035,19 +1053,19 @@ export default function AdminDashboard() {
 
       {/* Delete Confirm */}
       <AlertDialog open={!!deleteConfirm} onOpenChange={v => !v && setDeleteConfirm(null)}>
-        <AlertDialogContent className="bg-slate-900 border-white/10 text-white rounded-2xl max-w-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-3 text-lg font-black">
               <Trash2 className="w-6 h-6 text-red-400" /> Delete Item Permanently?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/40 mt-2 text-sm">
+            <AlertDialogDescription className="text-foreground/40 mt-2 text-sm">
               This will permanently remove the item from the database. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 mt-4">
-            <AlertDialogCancel className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl border-border bg-secondary hover:bg-secondary text-foreground font-bold">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => handleDeleteItem(deleteConfirm)}
-              className="rounded-xl font-bold border-0 bg-red-600 hover:bg-red-500 text-white">
+              className="rounded-xl font-bold border-0 bg-red-600 hover:bg-red-500 text-primary-foreground">
               Yes, Delete Permanently
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1065,13 +1083,13 @@ export default function AdminDashboard() {
           }
         }}
       >
-        <AlertDialogContent className="bg-slate-900 border-white/10 text-white rounded-2xl max-w-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-lg font-black">
               <KeyRound className="w-5 h-5 text-rose-400" />
               Update Admin Credentials
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/40 mt-2 text-sm">
+            <AlertDialogDescription className="text-foreground/40 mt-2 text-sm">
               Change admin ID and password in one step.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -1082,7 +1100,7 @@ export default function AdminDashboard() {
               placeholder="New admin ID (optional)"
               value={passwordForm.newAdminId}
               onChange={(e) => setPasswordForm((prev) => ({ ...prev, newAdminId: e.target.value }))}
-              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20"
+              className="h-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground/50"
               autoComplete="username"
               disabled={changingPassword}
             />
@@ -1092,14 +1110,14 @@ export default function AdminDashboard() {
               placeholder="Old password"
               value={passwordForm.oldPassword}
               onChange={(e) => setPasswordForm((prev) => ({ ...prev, oldPassword: e.target.value }))}
-              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 pr-10"
+              className="h-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 pr-10"
               autoComplete="current-password"
               disabled={changingPassword}
             />
               <button
                 type="button"
                 onClick={() => setShowPasswords((prev) => ({ ...prev, oldPassword: !prev.oldPassword }))}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-muted-foreground"
                 aria-label={showPasswords.oldPassword ? "Hide old password" : "Show old password"}
               >
                 {showPasswords.oldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1111,14 +1129,14 @@ export default function AdminDashboard() {
               placeholder="New password"
               value={passwordForm.newPassword}
               onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
-              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 pr-10"
+              className="h-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 pr-10"
               autoComplete="new-password"
               disabled={changingPassword}
             />
               <button
                 type="button"
                 onClick={() => setShowPasswords((prev) => ({ ...prev, newPassword: !prev.newPassword }))}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-muted-foreground"
                 aria-label={showPasswords.newPassword ? "Hide new password" : "Show new password"}
               >
                 {showPasswords.newPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1130,14 +1148,14 @@ export default function AdminDashboard() {
               placeholder="Confirm new password"
               value={passwordForm.confirmPassword}
               onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-              className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 pr-10"
+              className="h-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground/50 pr-10"
               autoComplete="new-password"
               disabled={changingPassword}
             />
               <button
                 type="button"
                 onClick={() => setShowPasswords((prev) => ({ ...prev, confirmPassword: !prev.confirmPassword }))}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-muted-foreground"
                 aria-label={showPasswords.confirmPassword ? "Hide confirm password" : "Show confirm password"}
               >
                 {showPasswords.confirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1145,13 +1163,13 @@ export default function AdminDashboard() {
             </div>
 
             <AlertDialogFooter className="gap-3 mt-4">
-              <AlertDialogCancel className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold">
+              <AlertDialogCancel className="rounded-xl border-border bg-secondary hover:bg-secondary text-foreground font-bold">
                 Cancel
               </AlertDialogCancel>
               <Button
                 type="submit"
                 disabled={changingPassword}
-                className="rounded-xl font-bold bg-rose-600 hover:bg-rose-500 text-white"
+                className="rounded-xl font-bold bg-rose-600 hover:bg-rose-500 text-foreground"
               >
                 {changingPassword ? "Updating..." : "Update Password"}
               </Button>

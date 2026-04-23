@@ -131,7 +131,7 @@ export default function MyPosts() {
 
       <main className="flex-1">
         {/* Profile Cover Header */}
-        <div className="bg-gradient-to-b from-primary/10 to-background border-b border-white/5">
+        <div className="bg-gradient-to-b from-primary/10 to-background border-b border-border">
           <div className="max-w-5xl mx-auto px-4 pt-10 pb-0">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 pb-0">
               {/* Avatar */}
@@ -143,7 +143,7 @@ export default function MyPosts() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-white" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-foreground" />
                 </div>
               </div>
 
@@ -151,7 +151,7 @@ export default function MyPosts() {
               <div className="flex-1 pb-5">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl font-extrabold text-white">
+                    <h1 className="text-2xl font-extrabold text-foreground">
                       {dbUser?.firstName} {dbUser?.lastName}
                     </h1>
                     <p className="text-muted-foreground text-sm mt-0.5">
@@ -168,7 +168,7 @@ export default function MyPosts() {
                 {/* Stats Row */}
                 <div className="flex items-center gap-8 mt-5">
                   <div className="text-center">
-                    <p className="text-xl font-extrabold text-white">{items.length}</p>
+                    <p className="text-xl font-extrabold text-foreground">{items.length}</p>
                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Posts</p>
                   </div>
                   <div className="text-center">
@@ -192,15 +192,15 @@ export default function MyPosts() {
             </div>
  
             {/* Filter Tabs */}
-            <div className="flex gap-0 border-b border-white/5 -mb-px mt-4 overflow-x-auto custom-scrollbar">
+            <div className="flex gap-0 border-b border-border -mb-px mt-4 overflow-x-auto custom-scrollbar">
               {["all", "Lost", "Found", "Claims", "Returned"].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 sm:px-6 py-3 text-xs sm:text-sm font-semibold capitalize border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === tab
-                      ? "border-primary text-white"
-                      : "border-transparent text-muted-foreground hover:text-white"
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab === "all" ? "All Posts" : tab}
@@ -218,7 +218,7 @@ export default function MyPosts() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <Card key={i} className="bg-card/40 border-white/5 rounded-2xl overflow-hidden">
+                <Card key={i} className="bg-card/40 border-border rounded-2xl overflow-hidden">
                   <Skeleton className="h-52 w-full rounded-none" />
                   <CardContent className="p-5 space-y-3">
                     <Skeleton className="h-5 w-3/4" />
@@ -234,16 +234,16 @@ export default function MyPosts() {
           ) : activeTab === "Claims" ? (
             <div className="space-y-6">
               {/* Claims Filters */}
-              <div className="flex flex-wrap items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+              <div className="flex flex-wrap items-center gap-4 bg-secondary p-4 rounded-2xl border border-border">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Type:</span>
-                  <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+                  <div className="flex bg-card p-1 rounded-lg border border-border">
                     {["all", "Lost", "Found"].map(t => (
                       <button
                         key={t}
                         onClick={() => setClaimTypeFilter(t)}
                         className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${
-                          claimTypeFilter === t ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:text-white"
+                          claimTypeFilter === t ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         {t.toUpperCase()}
@@ -252,11 +252,11 @@ export default function MyPosts() {
                   </div>
                 </div>
                 
-                <div className="h-4 w-px bg-white/10 hidden sm:block" />
+                <div className="h-4 w-px bg-secondary hidden sm:block" />
                 
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Status:</span>
-                  <div className="flex flex-wrap bg-black/40 p-1 rounded-lg border border-white/5 gap-1">
+                  <div className="flex flex-wrap bg-card p-1 rounded-lg border border-border gap-1">
                     {[
                       { id: "all", label: "ALL" },
                       { id: "approved", label: "ACCEPTED" },
@@ -266,7 +266,7 @@ export default function MyPosts() {
                         key={s.id}
                         onClick={() => setClaimStatusFilter(s.id)}
                         className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${
-                          claimStatusFilter === s.id ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:text-white"
+                          claimStatusFilter === s.id ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         {s.label}
@@ -277,9 +277,9 @@ export default function MyPosts() {
               </div>
 
               {filteredClaims.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center bg-card/20 border border-dashed border-white/10 rounded-3xl">
-                   <Search className="h-10 w-10 text-white/10 mb-4" />
-                   <h3 className="text-lg font-bold text-white mb-1">No matching claims found</h3>
+                <div className="flex flex-col items-center justify-center py-20 text-center bg-card/20 border border-dashed border-border rounded-3xl">
+                   <Search className="h-10 w-10 text-muted-foreground/30 mb-4" />
+                   <h3 className="text-lg font-bold text-foreground mb-1">No matching claims found</h3>
                    <p className="text-xs text-muted-foreground">Adjust your filters to see more results.</p>
                 </div>
               ) : (
@@ -298,41 +298,41 @@ export default function MyPosts() {
                     const currentStatus = statusInfo[claim.status] || { label: claim.status, color: "bg-muted" };
 
                     return (
-                      <Card key={claim._id} className={`bg-card border-white/5 transition-all duration-200 rounded-2xl overflow-hidden flex flex-col group relative isolate ${isReturned ? "opacity-60 grayscale-[50%]" : "hover:border-white/10"}`}>
+                      <Card key={claim._id} className={`bg-card border-border transition-all duration-200 rounded-2xl overflow-hidden flex flex-col group relative isolate ${isReturned ? "opacity-60 grayscale-[50%]" : "hover:border-border"}`}>
                         
                         {/* Returned Stamp */}
                         {isReturned && (
                           <div className="absolute inset-0 z-50 pointer-events-none overflow-hidden rounded-2xl">
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-red-600/90 text-white font-black tracking-[0.2em] text-sm py-2 px-12 shadow-2xl border-y-2 border-red-500/50 backdrop-blur-md z-50 whitespace-nowrap">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-red-600/90 text-foreground font-black tracking-[0.2em] text-sm py-2 px-12 shadow-2xl border-y-2 border-red-500/50 backdrop-blur-md z-50 whitespace-nowrap">
                               RETURNED
                             </div>
                           </div>
                         )}
 
-                        <div className={`h-44 bg-white/5 relative overflow-hidden flex-shrink-0 ${isReturned ? "pointer-events-none" : ""}`}>
+                        <div className={`h-44 bg-secondary relative overflow-hidden flex-shrink-0 ${isReturned ? "pointer-events-none" : ""}`}>
                           {item.imageUrl ? (
                             <img src={item.imageUrl} alt={item.title} className={`w-full h-full object-cover transition-transform duration-500 ${isReturned ? "" : "group-hover:scale-105"}`} />
                           ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-black/20 text-muted-foreground">
-                              <Package className="h-10 w-10 text-white/10 mb-2" />
-                              <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest text-center px-4">No image available</span>
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-secondary text-muted-foreground">
+                              <Package className="h-10 w-10 text-muted-foreground/30 mb-2" />
+                              <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest text-center px-4">No image available</span>
                             </div>
                           )}
                           <div className="absolute top-3 left-3 flex flex-col gap-2">
-                             <Badge className={`font-bold tracking-widest text-[9px] uppercase border-none ${item.status === "Found" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                             <Badge className={`font-bold tracking-widest text-[9px] uppercase border-none ${item.status === "Found" ? "bg-green-500 text-primary-foreground" : "bg-red-500 text-primary-foreground"}`}>
                                 {item.status === "Found" ? "CLAIM" : "I FOUND THIS"}
                              </Badge>
-                             <Badge className={`font-bold tracking-widest text-[9px] uppercase border-none flex items-center gap-1 ${currentStatus.color} text-white`}>
+                             <Badge className={`font-bold tracking-widest text-[9px] uppercase border-none flex items-center gap-1 ${currentStatus.color} text-foreground`}>
                                 {currentStatus.icon} {currentStatus.label}
                              </Badge>
                           </div>
                         </div>
                         <CardContent className="p-4 flex-1 flex flex-col pointer-events-auto z-40 relative">
-                          <h3 className="font-bold text-white text-sm line-clamp-1 mb-1">{item.title}</h3>
+                          <h3 className="font-bold text-foreground text-sm line-clamp-1 mb-1">{item.title}</h3>
                           <p className="text-xs text-muted-foreground line-clamp-2 italic mb-3 opacity-80 min-h-[2.5rem]">
                             "{claim.message}"
                           </p>
-                          <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
+                          <div className="mt-auto pt-3 border-t border-border flex items-center justify-between">
                             <span className="text-[10px] text-muted-foreground font-medium">Claimed {timeAgo(claim.createdAt)}</span>
                             {isReturned ? (
                               <Button disabled variant="ghost" size="sm" className="h-7 text-[10px] font-bold text-muted-foreground gap-1">
@@ -354,13 +354,13 @@ export default function MyPosts() {
               )}
             </div>
           ) : activeTab === "Returned" ? (
-            <div className="bg-card/20 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            <div className="bg-card/20 border border-border rounded-3xl overflow-hidden shadow-2xl">
               {filteredItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="h-20 w-20 rounded-full bg-white/5 flex items-center justify-center mb-5">
-                    <CheckCircle2 className="h-10 w-10 text-white/10" />
+                  <div className="h-20 w-20 rounded-full bg-secondary flex items-center justify-center mb-5">
+                    <CheckCircle2 className="h-10 w-10 text-muted-foreground/30" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">No returned items yet</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-2">No returned items yet</h3>
                   <p className="text-muted-foreground max-w-xs text-sm">
                     Items you've successfully returned to their owners will appear here in a structured format.
                   </p>
@@ -369,7 +369,7 @@ export default function MyPosts() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[600px]">
                     <thead>
-                      <tr className="bg-white/5 border-b border-white/5">
+                      <tr className="bg-secondary border-b border-border">
                         <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest w-16">#</th>
                         <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Item Name</th>
                         <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Status</th>
@@ -386,7 +386,7 @@ export default function MyPosts() {
                               {item.imageUrl && (
                                 <img src={item.imageUrl} className="h-8 w-8 rounded-lg object-cover ring-1 ring-white/10" alt="" />
                               )}
-                              <span className="font-bold text-white text-sm">{item.title}</span>
+                              <span className="font-bold text-foreground text-sm">{item.title}</span>
                             </Link>
                           </td>
                           <td className="px-6 py-4 text-center">
@@ -419,10 +419,10 @@ export default function MyPosts() {
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="h-20 w-20 rounded-full bg-white/5 flex items-center justify-center mb-5">
-                <Package className="h-10 w-10 text-white/10" />
+              <div className="h-20 w-20 rounded-full bg-secondary flex items-center justify-center mb-5">
+                <Package className="h-10 w-10 text-muted-foreground/30" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">No posts yet</h3>
+              <h3 className="text-xl font-bold text-foreground mb-2">No posts yet</h3>
               <p className="text-muted-foreground mb-6 max-w-xs">
                 {activeTab === "all"
                   ? "You haven't reported any items yet. Start by creating your first post."
@@ -440,19 +440,19 @@ export default function MyPosts() {
                 return (
                   <Card
                     key={item._id}
-                    className={`bg-card border-white/5 transition-all duration-200 rounded-2xl overflow-hidden flex flex-col group relative isolate ${isReturned ? "opacity-60 grayscale-[50%]" : "hover:border-white/10"}`}
+                    className={`bg-card border-border transition-all duration-200 rounded-2xl overflow-hidden flex flex-col group relative isolate ${isReturned ? "opacity-60 grayscale-[50%]" : "hover:border-border"}`}
                   >
                     {/* Returned Stamp */}
                     {isReturned && (
                       <div className="absolute inset-0 z-50 pointer-events-none overflow-hidden rounded-2xl">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-red-600/90 text-white font-black tracking-[0.2em] text-xl py-3 px-16 shadow-2xl border-y-4 border-red-500/50 backdrop-blur-md z-50 whitespace-nowrap">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 bg-red-600/90 text-foreground font-black tracking-[0.2em] text-xl py-3 px-16 shadow-2xl border-y-4 border-red-500/50 backdrop-blur-md z-50 whitespace-nowrap">
                           RETURNED
                         </div>
                       </div>
                     )}
 
                     {/* Image */}
-                    <div className={`h-52 bg-white/5 relative overflow-hidden flex-shrink-0 ${isReturned ? "pointer-events-none" : ""}`}>
+                    <div className={`h-52 bg-secondary relative overflow-hidden flex-shrink-0 ${isReturned ? "pointer-events-none" : ""}`}>
                       {item.imageUrl ? (
                         <img
                           src={item.imageUrl}
@@ -460,34 +460,34 @@ export default function MyPosts() {
                           className={`w-full h-full object-cover transition-transform duration-500 ${isReturned ? "" : "group-hover:scale-105"}`}
                         />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-black/20 text-muted-foreground">
-                          <Package className="h-12 w-12 text-white/10 mb-2" />
-                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest text-center px-4">No image available</span>
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-secondary text-muted-foreground">
+                          <Package className="h-12 w-12 text-muted-foreground/30 mb-2" />
+                          <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest text-center px-4">No image available</span>
                         </div>
                       )}
 
                     {/* Status Badge */}
                     <div className="absolute top-3 left-3">
-                      <Badge className={`font-bold tracking-widest text-[10px] uppercase border-none ${item.status === "Found" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                      <Badge className={`font-bold tracking-widest text-[10px] uppercase border-none ${item.status === "Found" ? "bg-green-500 text-primary-foreground" : "bg-red-500 text-primary-foreground"}`}>
                         {item.status}
                       </Badge>
                     </div>
 
                     {/* Time */}
-                    <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm rounded-full text-[10px] font-semibold text-white/70 px-2 py-0.5">
+                    <div className="absolute bottom-3 right-3 bg-card backdrop-blur-sm rounded-full text-[10px] font-semibold text-muted-foreground px-2 py-0.5">
                       {timeAgo(item.createdAt)}
                     </div>
                   </div>
 
                   {/* Card Content */}
                   <CardContent className="p-5 flex-1 flex flex-col">
-                    <h3 className="font-bold text-white text-base line-clamp-1 mb-1">{item.title}</h3>
+                    <h3 className="font-bold text-foreground text-base line-clamp-1 mb-1">{item.title}</h3>
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                       <MapPin className="h-3.5 w-3.5 shrink-0 opacity-60" />
                       <span className="truncate">{item.location || "No location"}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground capitalize mb-4">
-                      <span className="bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">{item.category}</span>
+                      <span className="bg-secondary border border-border px-2 py-0.5 rounded-full">{item.category}</span>
                     </div>
 
                     {/* Action Buttons */}
@@ -495,7 +495,7 @@ export default function MyPosts() {
                       {isReturned ? (
                         <Button 
                           disabled 
-                          className="w-full h-9 rounded-xl text-xs font-bold bg-white/10 text-white/50 border border-white/10"
+                          className="w-full h-9 rounded-xl text-xs font-bold bg-secondary text-foreground/50 border border-border"
                         >
                           Item Returned
                         </Button>
@@ -514,7 +514,7 @@ export default function MyPosts() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="w-full h-9 border-white/10 bg-white/5 hover:bg-white/10 rounded-xl text-xs gap-1.5"
+                                className="w-full h-9 border-border bg-secondary hover:bg-secondary rounded-xl text-xs gap-1.5"
                               >
                                 <Eye className="h-3.5 w-3.5" /> View
                               </Button>
@@ -556,7 +556,7 @@ export default function MyPosts() {
       </main>
 
       <AlertDialog open={!!returnAlertId} onOpenChange={(open) => !open && setReturnAlertId(null)}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3 mb-2">
               <CheckCircle2 className="h-7 w-7 text-green-500" /> Are you absolutely sure?
@@ -566,7 +566,7 @@ export default function MyPosts() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-4">
-            <AlertDialogCancel className="bg-white/5 border-white/10 hover:bg-white/10 hover:text-white rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-secondary border-border hover:bg-secondary hover:text-foreground rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
             <AlertDialogAction className="bg-green-600 hover:bg-green-500 rounded-xl font-bold shadow-lg shadow-green-900/20 py-6 px-8 text-base" onClick={confirmMarkReturned}>
               Mark as Returned
             </AlertDialogAction>
@@ -575,7 +575,7 @@ export default function MyPosts() {
       </AlertDialog>
 
       <AlertDialog open={!!deleteAlertId} onOpenChange={(open) => !open && setDeleteAlertId(null)}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3 mb-2">
               <Trash2 className="h-7 w-7 text-red-500" /> Are you sure to delete?
@@ -585,7 +585,7 @@ export default function MyPosts() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-4">
-            <AlertDialogCancel className="bg-white/5 border-white/10 hover:bg-white/10 hover:text-white rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-secondary border-border hover:bg-secondary hover:text-foreground rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
             <AlertDialogAction className="bg-red-600 hover:bg-red-500 rounded-xl font-bold shadow-lg shadow-red-900/20 py-6 px-8 text-base" onClick={confirmDelete}>
               Yes, Delete
             </AlertDialogAction>

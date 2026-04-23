@@ -364,14 +364,14 @@ export default function Messages() {
       <div className="flex flex-1 min-h-0 overflow-hidden max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 gap-4 sm:gap-6">
 
         {/* LEFT: Conversation List */}
-        <aside className={`${itemId ? "hidden lg:flex" : "flex"} w-full lg:w-[320px] shrink-0 flex-col bg-card/30 border border-white/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/20`}>
-          <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/5 relative">
+        <aside className={`${itemId ? "hidden lg:flex" : "flex"} w-full lg:w-[320px] shrink-0 flex-col bg-card/30 border border-border rounded-2xl overflow-hidden shadow-2xl shadow-black/20`}>
+          <div className="p-5 border-b border-border flex items-center justify-between bg-secondary relative">
             <h2 className="font-bold text-xl tracking-tight">Messages</h2>
             <div className="relative">
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={`h-8 w-8 rounded-lg transition-colors ${sidebarMenuOpen ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white"}`}
+                className={`h-8 w-8 rounded-lg transition-colors ${sidebarMenuOpen ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                 onClick={() => setSidebarMenuOpen(!sidebarMenuOpen)}
               >
                 <MoreVertical className="h-4 w-4" />
@@ -380,13 +380,13 @@ export default function Messages() {
               {sidebarMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setSidebarMenuOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-card shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     <button
                       onClick={() => {
                         setSidebarMenuOpen(false);
                         navigate("/blocked-messages");
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                     >
                       <Ban className="h-4 w-4" /> Blocked Chats
                     </button>
@@ -396,19 +396,19 @@ export default function Messages() {
             </div>
           </div>
 
-          <div className="p-3 border-b border-white/5">
+          <div className="p-3 border-b border-border">
             <div className="relative">
               <Input
                 placeholder="Search chats..."
                 value={chatSearch}
                 onChange={(e) => setChatSearch(e.target.value)}
-                className="bg-white/5 border-white/10 h-10 rounded-xl text-sm pl-9 pr-8"
+                className="bg-secondary border-border h-10 rounded-xl text-sm pl-9 pr-8"
               />
               <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               {chatSearch && (
                 <button 
                   onClick={() => setChatSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -442,12 +442,12 @@ export default function Messages() {
                     // Highlight if this is the active user
                     location.pathname.includes(conv.otherUser?._id)
                       ? "bg-primary/20 border-primary/30"
-                      : "hover:bg-white/5 border-transparent"
+                      : "hover:bg-secondary border-transparent"
                   }`}
                 >
                   {/* Participant Avatar */}
                   <div className="relative shrink-0">
-                    <Avatar className="h-12 w-12 rounded-xl border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-200">
+                    <Avatar className="h-12 w-12 rounded-xl border border-border shadow-lg group-hover:scale-105 transition-transform duration-200">
                       <AvatarImage src={conv.otherUser?.avatar} />
                       <AvatarFallback className="bg-primary/20 text-primary text-xs font-black">
                         {conv.otherUser?.firstName?.[0]?.toUpperCase() || "?"}
@@ -457,7 +457,7 @@ export default function Messages() {
                       <div className="absolute top-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background z-10" />
                     )}
                     {/* Tiny Item Thumbnail overlay */}
-                    <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-card border border-white/10 overflow-hidden shadow-md flex items-center justify-center p-0.5">
+                    <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-card border border-border overflow-hidden shadow-md flex items-center justify-center p-0.5">
                       {conv.item?.imageUrl ? (
                         <img src={conv.item.imageUrl} alt={conv.item.title} className="w-full h-full object-cover rounded-sm" />
                       ) : (
@@ -469,7 +469,7 @@ export default function Messages() {
                   {/* Chat Info */}
                   <div className="min-w-0 flex-1 text-left">
                     <div className="flex items-center justify-between gap-2 mb-0.5">
-                      <p className={`font-bold text-sm truncate ${itemId === conv.item?._id ? "text-white" : "text-white/90"}`}>
+                      <p className={`font-bold text-sm truncate ${itemId === conv.item?._id ? "text-foreground" : "text-foreground/90"}`}>
                         {conv.otherUser?.firstName || "User"}
                       </p>
                       {conv.latestMessage && (
@@ -486,14 +486,14 @@ export default function Messages() {
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
-                       <p className={`text-xs truncate flex-1 leading-snug ${conv.unreadCount > 0 ? "text-white font-black" : "text-muted-foreground"}`}>
+                       <p className={`text-xs truncate flex-1 leading-snug ${conv.unreadCount > 0 ? "text-foreground font-black" : "text-muted-foreground"}`}>
                         {conv.latestMessage?.sender?._id === dbUser?._id && (
                           <span className="text-primary/70 mr-1 font-bold">You:</span>
                         )}
                         {conv.latestMessage?.message || "No messages yet"}
                       </p>
                       {conv.unreadCount > 0 && (
-                        <span className="h-5 min-w-[20px] px-1.5 bg-primary rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 animate-pulse shadow-lg shadow-primary/20">
+                        <span className="h-5 min-w-[20px] px-1.5 bg-primary rounded-full flex items-center justify-center text-[10px] font-black text-foreground shrink-0 animate-pulse shadow-lg shadow-primary/20">
                           {conv.unreadCount}
                         </span>
                       )}
@@ -506,20 +506,20 @@ export default function Messages() {
         </aside>
 
         {/* RIGHT: Chat Window */}
-        <main className={`${!itemId ? "hidden lg:flex" : "flex"} flex-1 flex-col bg-card/30 border border-white/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/20 relative`}>
+        <main className={`${!itemId ? "hidden lg:flex" : "flex"} flex-1 flex-col bg-card/30 border border-border rounded-2xl overflow-hidden shadow-2xl shadow-black/20 relative`}>
           {!itemId ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
               <div className="h-20 w-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 animate-bounce duration-3000">
                 <MessageSquare className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Open any chat to start conversation</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2">Open any chat to start conversation</h3>
               <p className="text-muted-foreground max-w-sm">
                 Select a conversation from the left sidebar to begin Messaging or view previously opened chats.
               </p>
             </div>
           ) : loading ? (
             <div className="flex-1 flex flex-col">
-              <div className="p-4 border-b border-white/5 flex items-center gap-4">
+              <div className="p-4 border-b border-border flex items-center gap-4">
                 <Skeleton className="h-11 w-11 rounded-xl" />
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-32" />
@@ -539,11 +539,11 @@ export default function Messages() {
             <>
               {/* Chat Header */}
               {item && (
-                <div className="px-5 py-4 border-b border-white/5 flex items-center gap-4 bg-white/5 backdrop-blur-sm z-10">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white rounded-lg lg:hidden" onClick={() => navigate("/messages")}>
+                <div className="px-5 py-4 border-b border-border flex items-center gap-4 bg-secondary backdrop-blur-sm z-10">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-lg lg:hidden" onClick={() => navigate("/messages")}>
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
-                  <div className="h-11 w-11 rounded-xl border border-white/10 overflow-hidden bg-white/5 shrink-0">
+                  <div className="h-11 w-11 rounded-xl border border-border overflow-hidden bg-secondary shrink-0">
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage src={otherUser?.avatar} />
                       <AvatarFallback className="bg-primary/20 text-primary text-xs font-black">
@@ -553,13 +553,13 @@ export default function Messages() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-lg text-white truncate">
+                      <p className="font-bold text-lg text-foreground truncate">
                         {otherUser?.firstName ? `${otherUser.firstName} ${otherUser.lastName || ""}` : "User"}
                       </p>
                       {onlineUsers.has(String(otherUser?._id)) ? (
                         <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[9px] px-1.5 py-0">Online</Badge>
                       ) : (
-                        <Badge variant="outline" className="text-muted-foreground border-white/10 text-[9px] px-1.5 py-0">Offline</Badge>
+                        <Badge variant="outline" className="text-muted-foreground border-border text-[9px] px-1.5 py-0">Offline</Badge>
                       )}
                       {claimStatus === "approved" && <Badge className="text-[9px] font-bold text-green-400 border-green-400/30 bg-green-400/10 px-1.5 py-0.5 ml-auto">APPROVED</Badge>}
                     </div>
@@ -572,7 +572,7 @@ export default function Messages() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Link to={`/item/${itemId}`}>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-white rounded-xl">
+                      <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground rounded-xl">
                         <Info className="h-4 w-4" />
                       </Button>
                     </Link>
@@ -580,7 +580,7 @@ export default function Messages() {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className={`h-9 w-9 rounded-xl transition-colors ${chatMenuOpen ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white"}`}
+                        className={`h-9 w-9 rounded-xl transition-colors ${chatMenuOpen ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                         onClick={() => setChatMenuOpen(!chatMenuOpen)}
                       >
                         <MoreVertical className="h-4 w-4" />
@@ -589,13 +589,13 @@ export default function Messages() {
                       {chatMenuOpen && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setChatMenuOpen(false)} />
-                          <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-card shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                          <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                             <button
                               onClick={() => {
                                 setChatMenuOpen(false);
                                 setShowReportAlert(true);
                               }}
-                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors border-b border-white/5"
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors border-b border-border"
                             >
                               <Flag className="h-4 w-4" /> Report User
                             </button>
@@ -633,9 +633,9 @@ export default function Messages() {
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center gap-4 py-16">
-                    <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center"><ShieldCheck className="h-8 w-8 text-primary/40" /></div>
+                    <div className="h-16 w-16 rounded-full bg-secondary flex items-center justify-center"><ShieldCheck className="h-8 w-8 text-primary/40" /></div>
                     <div>
-                      <p className="text-lg font-bold text-white mb-2">No messages yet</p>
+                      <p className="text-lg font-bold text-foreground mb-2">No messages yet</p>
                       <p className="text-sm text-muted-foreground max-w-xs">Send a message to start the conversation.</p>
                     </div>
                   </div>
@@ -644,19 +644,19 @@ export default function Messages() {
                     const mine = isMe(msg);
                     return (
                       <div key={msg._id || idx} className={`flex items-end gap-3 ${mine ? "flex-row-reverse" : ""}`}>
-                        <Avatar className="h-8 w-8 border border-white/10 shrink-0 mb-1">
+                        <Avatar className="h-8 w-8 border border-border shrink-0 mb-1">
                           <AvatarImage src={mine ? dbUser?.avatar : msg.sender?.avatar} />
                           <AvatarFallback className="bg-primary/20 text-primary text-[10px] font-bold">
                             {(mine ? dbUser?.firstName?.[0] : msg.sender?.firstName?.[0] || "?").toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className={`flex flex-col max-w-[70%] ${mine ? "items-end" : "items-start"}`}>
-                          <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed relative ${mine ? "bg-primary text-white rounded-br-none shadow-lg shadow-primary/20" : "bg-white/10 text-white rounded-bl-none"}`}>
+                          <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed relative ${mine ? "bg-primary text-primary-foreground rounded-br-none shadow-lg shadow-primary/20" : "bg-secondary text-foreground rounded-bl-none"}`}>
                             {msg.message}
                             {mine && msg._id && !msg._id.startsWith("temp-") && (
                                 <div className="absolute bottom-1 right-2 flex items-center">
-                                    {msg.status === "sent" && <Check className="h-3 w-3 text-white/50" />}
-                                    {msg.status === "delivered" && <CheckCheck className="h-3 w-3 text-white/50" />}
+                                    {msg.status === "sent" && <Check className="h-3 w-3 text-foreground/50" />}
+                                    {msg.status === "delivered" && <CheckCheck className="h-3 w-3 text-foreground/50" />}
                                     {msg.status === "read" && <CheckCheck className="h-3 w-3 text-blue-300" />}
                                 </div>
                             )}
@@ -687,7 +687,7 @@ export default function Messages() {
               </div>
 
               {/* Input */}
-              <form onSubmit={handleSend} className="p-4 border-t border-white/5 bg-white/5 flex items-center gap-3 relative overflow-hidden">
+              <form onSubmit={handleSend} className="p-4 border-t border-border bg-secondary flex items-center gap-3 relative overflow-hidden">
                 {item?.state === "returned" && (
                   <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
                     <p className="text-sm font-bold text-muted-foreground flex items-center gap-2">
@@ -703,7 +703,7 @@ export default function Messages() {
                   }}
                   onBlur={() => stopTyping(conversationId, otherUser?._id)}
                   placeholder="Type a message..."
-                  className="flex-1 bg-white/5 border-white/10 h-11 rounded-xl text-sm"
+                  className="flex-1 bg-secondary border-border h-11 rounded-xl text-sm"
                   disabled={sending || item?.state === "returned"}
                 />
                 <Button 
@@ -723,7 +723,7 @@ export default function Messages() {
 
 
       <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-8 max-w-lg mx-auto backdrop-blur-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-8 max-w-lg mx-auto backdrop-blur-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3">
               <Ban className="h-7 w-7 text-red-500" />
@@ -734,12 +734,12 @@ export default function Messages() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 mt-8">
-            <AlertDialogCancel className="rounded-xl px-6 h-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold">
+            <AlertDialogCancel className="rounded-xl px-6 h-12 border-border bg-secondary hover:bg-secondary text-foreground font-bold">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleToggleBlock}
-              className="rounded-xl px-6 h-12 bg-red-600 hover:bg-red-500 text-white font-bold border-0"
+              className="rounded-xl px-6 h-12 bg-red-600 hover:bg-red-500 text-primary-foreground font-bold border-0"
             >
               Confirm Block
             </AlertDialogAction>
@@ -748,7 +748,7 @@ export default function Messages() {
       </AlertDialog>
 
       <AlertDialog open={showReportAlert} onOpenChange={setShowReportAlert}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-8 max-w-lg mx-auto backdrop-blur-md">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-8 max-w-lg mx-auto backdrop-blur-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3">
               <Flag className="h-7 w-7 text-yellow-500" />
@@ -759,13 +759,13 @@ export default function Messages() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 mt-8">
-            <AlertDialogCancel disabled={reportSending} className="rounded-xl px-6 h-12 border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold">
+            <AlertDialogCancel disabled={reportSending} className="rounded-xl px-6 h-12 border-border bg-secondary hover:bg-secondary text-foreground font-bold">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleReportUser}
               disabled={reportSending}
-              className="rounded-xl px-6 h-12 bg-yellow-600 hover:bg-yellow-500 text-white font-bold border-0"
+              className="rounded-xl px-6 h-12 bg-yellow-600 hover:bg-yellow-500 text-foreground font-bold border-0"
             >
               {reportSending ? "Submitting..." : "Submit Report"}
             </AlertDialogAction>

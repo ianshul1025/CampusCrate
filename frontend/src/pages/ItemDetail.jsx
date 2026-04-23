@@ -306,7 +306,7 @@ export default function ItemDetail() {
         <div className="space-y-3">
           <div className="flex items-center gap-2 mb-1">
             <Users className="h-4 w-4 text-primary" />
-            <span className="font-bold text-white text-sm">
+            <span className="font-bold text-foreground text-sm">
               Incoming Claims
               {incomingClaims.length > 0 && (
                 <span className="ml-2 bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">
@@ -338,17 +338,17 @@ export default function ItemDetail() {
                         ? "border-yellow-500/20 bg-yellow-500/5"
                         : claim.status === "approved"
                         ? "border-green-500/20 bg-green-500/5"
-                        : "border-white/5 bg-white/5 opacity-60"
+                        : "border-border bg-secondary opacity-60"
                     }`}
                   >
                     {/* Claimant info */}
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7 border border-white/10 shrink-0">
+                      <Avatar className="h-7 w-7 border border-border shrink-0">
                         <AvatarImage src={claimant?.avatar} />
                         <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">{initials}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-white truncate">{name}</p>
+                        <p className="text-xs font-bold text-foreground truncate">{name}</p>
                         {claimant?.branch && (
                           <p className="text-[10px] text-muted-foreground truncate">{claimant.branch}</p>
                         )}
@@ -374,14 +374,14 @@ export default function ItemDetail() {
                         </div>
                       )}
                       {claim.status === "rejected" && (
-                        <span className="text-[9px] font-bold text-muted-foreground bg-white/5 border border-white/10 px-1.5 py-0.5 rounded-full shrink-0">
+                        <span className="text-[9px] font-bold text-muted-foreground bg-secondary border border-border px-1.5 py-0.5 rounded-full shrink-0">
                           REJECTED
                         </span>
                       )}
                     </div>
 
                     {/* Claim message */}
-                    <p className="text-xs text-white/80 bg-black/20 rounded-lg px-3 py-2 leading-relaxed">
+                    <p className="text-xs text-muted-foreground bg-secondary rounded-lg px-3 py-2 leading-relaxed">
                       "{claim.message}"
                     </p>
 
@@ -520,7 +520,7 @@ export default function ItemDetail() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">
                 {isLost ? "Finder Question" : "Security Question"}
               </p>
-              <p className="text-white/90 text-sm font-medium italic">"{item.claimQuestion}"</p>
+              <p className="text-foreground/90 text-sm font-medium italic">"{item.claimQuestion}"</p>
             </div>
           )}
           <Textarea
@@ -528,7 +528,7 @@ export default function ItemDetail() {
             placeholder={claimPlaceholder}
             value={claimAnswer}
             onChange={e => setClaimAnswer(e.target.value)}
-            className="bg-black/40 border-white/10 resize-none h-28 rounded-xl text-sm"
+            className="bg-card border-border resize-none h-28 rounded-xl text-sm"
           />
           <Button disabled={claiming} type="submit" className="w-full rounded-xl h-11 font-bold">
             {claiming ? "Submitting..." : "Submit →"}
@@ -555,7 +555,7 @@ export default function ItemDetail() {
         >
           {claimButtonLabel}
         </Button>
-        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
+        <div className="flex items-center gap-2 bg-secondary border border-border rounded-xl px-4 py-2.5">
           <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
           <p className="text-xs text-muted-foreground">
             Chat is locked until your claim is reviewed and approved by the poster.
@@ -578,20 +578,20 @@ export default function ItemDetail() {
           {/* Breadcrumbs & Actions */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div className="flex items-center text-sm text-muted-foreground font-medium gap-2">
-              <Link to="/" className="hover:text-white transition-colors">Home</Link>
+              <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
               <ChevronRight className="h-4 w-4 opacity-50" />
-              <Link to="/dashboard" className="hover:text-white transition-colors">{isLost ? "Lost Items" : "Found Items"}</Link>
+              <Link to="/dashboard" className="hover:text-foreground transition-colors">{isLost ? "Lost Items" : "Found Items"}</Link>
               <ChevronRight className="h-4 w-4 opacity-50" />
-              <span className="text-white capitalize">{item.category}</span>
+              <span className="text-foreground capitalize">{item.category}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="h-9 border-white/10 bg-white/5 hover:bg-white/10 rounded-full px-4" onClick={handleShareClick}>
+              <Button variant="outline" size="sm" className="h-9 border-border bg-secondary hover:bg-secondary rounded-full px-4" onClick={handleShareClick}>
                 <Share2 className="h-4 w-4 mr-2" /> Share
               </Button>
               <Button 
                 variant={dbUser?.savedItems?.includes(id) ? "secondary" : "outline"}
                 size="sm" 
-                className={`h-9 border-white/10 rounded-full px-4 transition-all ${dbUser?.savedItems?.includes(id) ? "bg-primary/20 text-primary border-primary/20 hover:bg-primary/30" : "bg-white/5 hover:bg-white/10 text-white/80"}`}
+                className={`h-9 border-border rounded-full px-4 transition-all ${dbUser?.savedItems?.includes(id) ? "bg-primary/20 text-primary border-primary/20 hover:bg-primary/30" : "bg-secondary hover:bg-secondary text-muted-foreground"}`}
                 onClick={handleToggleSave}
               >
                 <Bookmark className={`h-4 w-4 mr-2 ${dbUser?.savedItems?.includes(id) ? "fill-primary" : ""}`} /> 
@@ -635,7 +635,7 @@ export default function ItemDetail() {
 
           {/* Title Row */}
           <div className="mb-6">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">{item.title}</h1>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-2">{item.title}</h1>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               {item.location && (
                 <span className="flex items-center gap-1.5">
@@ -657,34 +657,34 @@ export default function ItemDetail() {
             <div className="lg:col-span-7 space-y-6">
 
               {/* Main Image */}
-              <div className="rounded-2xl overflow-hidden border border-white/5 bg-black/40 aspect-[4/3] relative">
+              <div className="rounded-2xl overflow-hidden border border-border bg-card aspect-[4/3] relative">
                 {item.imageUrl ? (
                   <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-black/20 text-muted-foreground">
-                    <Package className="h-20 w-20 text-white/10 mb-4" />
-                    <span className="text-sm font-bold text-white/30 uppercase tracking-widest text-center px-4">No image uploaded</span>
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-secondary text-muted-foreground">
+                    <Package className="h-20 w-20 text-muted-foreground/30 mb-4" />
+                    <span className="text-sm font-bold text-muted-foreground/50 uppercase tracking-widest text-center px-4">No image uploaded</span>
                   </div>
                 )}
                 <div className="absolute top-4 left-4">
-                  <Badge className={`font-bold tracking-widest text-xs px-3 py-1.5 uppercase border-none ${isLost ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}>
+                  <Badge className={`font-bold tracking-widest text-xs px-3 py-1.5 uppercase border-none ${isLost ? "bg-red-500 text-primary-foreground" : "bg-green-500 text-primary-foreground"}`}>
                     {item.status}
                   </Badge>
                 </div>
                 {item.imageUrl && (
-                  <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs text-white font-medium">
+                  <div className="absolute bottom-4 left-4 bg-card backdrop-blur-sm px-2.5 py-1 rounded-full text-xs text-foreground font-medium">
                     1 / 1 Photo
                   </div>
                 )}
               </div>
 
               {/* Item Details Section */}
-              <Card className="bg-card/40 border-white/5 rounded-2xl p-6">
-                <h2 className="text-lg font-bold mb-5 text-white">Item Details</h2>
+              <Card className="bg-card/40 border-border rounded-2xl p-6">
+                <h2 className="text-lg font-bold mb-5 text-foreground">Item Details</h2>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 text-sm">
                   <div>
                     <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest mb-1">Category</p>
-                    <p className="text-white font-medium capitalize">{item.category}</p>
+                    <p className="text-foreground font-medium capitalize">{item.category}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest mb-1">Status</p>
@@ -693,7 +693,7 @@ export default function ItemDetail() {
                   {item.location && (
                     <div>
                       <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest mb-1">Location</p>
-                      <p className="text-white font-medium flex items-center gap-1.5">
+                      <p className="text-foreground font-medium flex items-center gap-1.5">
                         <MapPin className="h-3.5 w-3.5 text-primary shrink-0" /> {item.location}
                       </p>
                     </div>
@@ -701,7 +701,7 @@ export default function ItemDetail() {
                   {item.date && (
                     <div>
                       <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest mb-1">Date</p>
-                      <p className="text-white font-medium flex items-center gap-1.5">
+                      <p className="text-foreground font-medium flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
                         {new Date(item.date).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
                       </p>
@@ -710,9 +710,9 @@ export default function ItemDetail() {
                 </div>
 
                 {item.description && (
-                  <div className="mt-5 pt-5 border-t border-white/5">
+                  <div className="mt-5 pt-5 border-t border-border">
                     <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest mb-2">Description</p>
-                    <p className="text-white/90 leading-relaxed text-sm">{item.description}</p>
+                    <p className="text-foreground/90 leading-relaxed text-sm">{item.description}</p>
                   </div>
                 )}
               </Card>
@@ -723,7 +723,7 @@ export default function ItemDetail() {
                   <div className="flex items-start gap-3 mb-4">
                     <ShieldCheck className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                     <div>
-                      <h3 className="font-bold text-white mb-1">{verificationTitle}</h3>
+                      <h3 className="font-bold text-foreground mb-1">{verificationTitle}</h3>
                       <p className="text-sm text-muted-foreground">{verificationSubtext}</p>
                     </div>
                   </div>
@@ -731,7 +731,7 @@ export default function ItemDetail() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">
                       {isLost ? "Finder Question" : "Security Question"}
                     </p>
-                    <p className="text-white/90 text-sm font-medium italic">"{item.claimQuestion}"</p>
+                    <p className="text-foreground/90 text-sm font-medium italic">"{item.claimQuestion}"</p>
                   </div>
                 </Card>
               )}
@@ -741,8 +741,8 @@ export default function ItemDetail() {
             <div className="lg:col-span-5 space-y-5">
 
               {/* Status & Reporter Card */}
-              <Card className="bg-card/40 border-white/5 rounded-2xl overflow-hidden">
-                <div className="p-5 flex items-center justify-between border-b border-white/5">
+              <Card className="bg-card/40 border-border rounded-2xl overflow-hidden">
+                <div className="p-5 flex items-center justify-between border-b border-border">
                   <div>
                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-widest mb-1">Status</p>
                     <div className="flex items-center gap-2">
@@ -754,18 +754,18 @@ export default function ItemDetail() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground font-semibold uppercase tracking-widest mb-1">{isLost ? "Lost by" : "Found by"}</p>
-                    <p className="text-white font-bold text-sm">{reporter?.firstName || "Anonymous"}</p>
+                    <p className="text-foreground font-bold text-sm">{reporter?.firstName || "Anonymous"}</p>
                   </div>
                 </div>
 
-                <div className="p-5 border-b border-white/5">
+                <div className="p-5 border-b border-border">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-11 w-11 border border-white/10">
+                    <Avatar className="h-11 w-11 border border-border">
                       <AvatarImage src={reporter?.avatar} />
                       <AvatarFallback className="bg-primary/20 text-primary font-bold">{reporterInitials}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-bold text-white">{reporterName}</p>
+                      <p className="font-bold text-foreground">{reporterName}</p>
                       <p className="text-xs text-muted-foreground">
                         {reporter?.branch ? `${reporter.branch} • Sem ${reporter.semester}` : "Verified Campus Member"}
                       </p>
@@ -783,23 +783,23 @@ export default function ItemDetail() {
               </Card>
 
               {/* Location & Time Card */}
-              <Card className="bg-card/40 border-white/5 rounded-2xl p-5">
-                <h3 className="font-bold text-white mb-4 text-sm">Location {isLost ? "Lost" : "Found"}</h3>
+              <Card className="bg-card/40 border-border rounded-2xl p-5">
+                <h3 className="font-bold text-foreground mb-4 text-sm">Location {isLost ? "Lost" : "Found"}</h3>
                 {/* Placeholder Map Visual */}
-                <div className="h-32 bg-white/5 rounded-xl flex items-center justify-center mb-4 border border-white/5 relative overflow-hidden">
+                <div className="h-32 bg-secondary rounded-xl flex items-center justify-center mb-4 border border-border relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-950/30 to-green-950/20" />
                   <div className="relative z-10 flex flex-col items-center gap-2 text-muted-foreground">
                     <MapPin className="h-7 w-7 text-primary" />
                     <span className="text-xs font-medium text-center px-4">{item.location || "Location not specified"}</span>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 bg-white/5 rounded-xl p-3">
+                <div className="flex items-start gap-3 bg-secondary rounded-xl p-3">
                   <Clock className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-0.5">
                       {isLost ? "Date Lost" : "Date Found"}
                     </p>
-                    <p className="text-sm text-white font-medium">
+                    <p className="text-sm text-foreground font-medium">
                       {item.date ? new Date(item.date).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }) : "Unknown"}
                     </p>
                   </div>
@@ -815,21 +815,21 @@ export default function ItemDetail() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {relatedItems.map(rel => (
                   <Link to={`/item/${rel._id}`} key={rel._id} className="group block">
-                    <Card className="bg-card border-white/5 hover:border-white/10 hover:-translate-y-1 transition-all duration-300 rounded-xl overflow-hidden">
-                      <div className="h-40 bg-white/5 relative overflow-hidden">
+                    <Card className="bg-card border-border hover:border-border hover:-translate-y-1 transition-all duration-300 rounded-xl overflow-hidden">
+                      <div className="h-40 bg-secondary relative overflow-hidden">
                         {rel.imageUrl ? (
                           <img src={rel.imageUrl} alt={rel.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Package className="h-10 w-10 text-white/5" />
+                            <Package className="h-10 w-10 text-foreground/5" />
                           </div>
                         )}
-                        <div className="absolute top-3 right-3 text-[10px] font-bold text-muted-foreground bg-black/60 backdrop-blur-sm rounded-full px-2 py-0.5">
+                        <div className="absolute top-3 right-3 text-[10px] font-bold text-muted-foreground bg-card backdrop-blur-sm rounded-full px-2 py-0.5">
                           {rel.status === "Found" ? "Found " : "Lost "}{timeAgo(rel.createdAt)}
                         </div>
                       </div>
                       <CardContent className="p-4">
-                        <h4 className="font-bold text-white group-hover:text-primary transition-colors truncate">{rel.title}</h4>
+                        <h4 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">{rel.title}</h4>
                         <p className="text-xs text-muted-foreground mt-1 truncate">{rel.location}</p>
                       </CardContent>
                     </Card>
@@ -845,7 +845,7 @@ export default function ItemDetail() {
       </main>
 
       <AlertDialog open={showReturnAlert} onOpenChange={setShowReturnAlert}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3 mb-2">
               <CheckCircle2 className="h-7 w-7 text-green-500" /> Are you absolutely sure?
@@ -855,7 +855,7 @@ export default function ItemDetail() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-4">
-            <AlertDialogCancel className="bg-white/5 border-white/10 hover:bg-white/10 hover:text-white rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-secondary border-border hover:bg-secondary hover:text-foreground rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
             <AlertDialogAction className="bg-green-600 hover:bg-green-500 rounded-xl font-bold shadow-lg shadow-green-900/20 py-6 px-8 text-base" onClick={confirmMarkReturned}>
               Mark as Returned
             </AlertDialogAction>
@@ -863,7 +863,7 @@ export default function ItemDetail() {
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
-        <AlertDialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
+        <AlertDialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3 mb-2">
               <Trash2 className="h-7 w-7 text-red-500" /> Are you sure to delete?
@@ -873,7 +873,7 @@ export default function ItemDetail() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-4">
-            <AlertDialogCancel className="bg-white/5 border-white/10 hover:bg-white/10 hover:text-white rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-secondary border-border hover:bg-secondary hover:text-foreground rounded-xl py-6 px-8 text-base">Cancel</AlertDialogCancel>
             <AlertDialogAction className="bg-red-600 hover:bg-red-500 rounded-xl font-bold shadow-lg shadow-red-900/20 py-6 px-8 text-base" onClick={confirmDelete}>
               Yes, Delete
             </AlertDialogAction>
@@ -882,7 +882,7 @@ export default function ItemDetail() {
       </AlertDialog>
 
       <Dialog open={showShareModal} onOpenChange={setShowShareModal}>
-        <DialogContent className="bg-card border-white/10 text-white rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
+        <DialogContent className="bg-card border-border text-foreground rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2 mb-1">
               <Share2 className="h-6 w-6 text-primary" /> Share this item
@@ -893,32 +893,32 @@ export default function ItemDetail() {
           </DialogHeader>
           <div className="grid grid-cols-4 gap-4 mt-6">
             <a href={`https://api.whatsapp.com/send?text=Check out this item on CampusCrate: ${window.location.href}`} target="_blank" rel="noreferrer" className="flex flex-col flex-1 items-center gap-2 group">
-               <div className="w-14 h-14 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all">
+               <div className="w-14 h-14 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center group-hover:bg-green-500 group-hover:text-foreground transition-all">
                  <MessageCircle className="h-6 w-6" />
                </div>
-               <span className="text-xs font-semibold text-muted-foreground group-hover:text-white">WhatsApp</span>
+               <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground">WhatsApp</span>
             </a>
             <a href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=Check out this item on CampusCrate`} target="_blank" rel="noreferrer" className="flex flex-col flex-1 items-center gap-2 group">
-               <div className="w-14 h-14 rounded-full bg-sky-500/10 text-sky-500 flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all">
+               <div className="w-14 h-14 rounded-full bg-sky-500/10 text-sky-500 flex items-center justify-center group-hover:bg-sky-500 group-hover:text-foreground transition-all">
                  <Twitter className="h-6 w-6" />
                </div>
-               <span className="text-xs font-semibold text-muted-foreground group-hover:text-white">Twitter</span>
+               <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground">Twitter</span>
             </a>
             <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${window.location.href}`} target="_blank" rel="noreferrer" className="flex flex-col flex-1 items-center gap-2 group">
-               <div className="w-14 h-14 rounded-full bg-blue-600/10 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+               <div className="w-14 h-14 rounded-full bg-blue-600/10 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-foreground transition-all">
                  <Linkedin className="h-6 w-6" />
                </div>
-               <span className="text-xs font-semibold text-muted-foreground group-hover:text-white">LinkedIn</span>
+               <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground">LinkedIn</span>
             </a>
             <a href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`} target="_blank" rel="noreferrer" className="flex flex-col flex-1 items-center gap-2 group">
-               <div className="w-14 h-14 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+               <div className="w-14 h-14 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-foreground transition-all">
                  <Facebook className="h-6 w-6" />
                </div>
-               <span className="text-xs font-semibold text-muted-foreground group-hover:text-white">Facebook</span>
+               <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground">Facebook</span>
             </a>
           </div>
-          <div className="mt-8 pt-6 border-t border-white/5 flex gap-3">
-             <div className="flex-1 overflow-hidden bg-white/5 rounded-xl flex items-center px-4 border border-white/10 text-sm text-muted-foreground truncate select-all">
+          <div className="mt-8 pt-6 border-t border-border flex gap-3">
+             <div className="flex-1 overflow-hidden bg-secondary rounded-xl flex items-center px-4 border border-border text-sm text-muted-foreground truncate select-all">
                {window.location.href}
              </div>
              <Button className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl h-11 px-6" onClick={copyToClipboard}>
