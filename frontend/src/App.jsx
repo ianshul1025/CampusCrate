@@ -160,7 +160,16 @@ function App() {
             </Routes>
           </SocketProvider>
         </AuthProvider>
-        <Toaster position="top-center" richColors theme="dark" />
+        <Toaster 
+          position="top-center" 
+          toastOptions={{
+            style: {
+              background: 'white',
+              color: '#C81010',
+              border: '1px solid #C81010',
+            }
+          }} 
+        />
       </BrowserRouter>
     </ClerkProvider>
   )

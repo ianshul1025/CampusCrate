@@ -193,7 +193,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <Box className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold tracking-tight text-foreground">CampusCrate</span>
+            <span className="text-xl font-bold tracking-tight text-foreground">Campus<span className="text-primary">Crate</span></span>
           </Link>
 
           {/* Desktop Links */}
@@ -207,7 +207,7 @@ export default function Navbar() {
                     key={link.name}
                     variant={isActive ? "secondary" : "ghost"}
                     asChild
-                    className={`rounded-full font-medium ${isActive ? "bg-secondary text-foreground hover:bg-secondary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                    className={`rounded-full font-medium transition-all duration-200 ease-in-out ${isActive ? "bg-secondary text-foreground hover:bg-secondary" : "text-muted-foreground hover:text-primary hover:bg-secondary/50"}`}
                   >
                     <Link to={link.path}>
                       <Icon size={18} className="mr-2" />

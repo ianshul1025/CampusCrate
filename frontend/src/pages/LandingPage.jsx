@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,13 @@ export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const handlePhoneClick = (e, phone) => {
+    // don't e.preventDefault() so tel: works
+    navigator.clipboard.writeText(phone)
+      .then(() => toast.success("Phone number copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy phone number"));
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -111,20 +119,20 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-2">
               <Box className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold tracking-tight">CampusCrate</span>
+              <span className="text-xl font-bold tracking-tight">Campus<span className="text-primary">Crate</span></span>
             </Link>
 
             <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-              <Link to="/" className="text-foreground transition-colors hover:text-foreground">Home</Link>
-              <a href="#how-it-works" className="transition-colors hover:text-foreground">How It Works</a>
-              <a href="#recent-items" className="transition-colors hover:text-foreground">Recent Items</a>
-              <a href="#contact" className="transition-colors hover:text-foreground">Contact</a>
+              <Link to="/" className="text-foreground transition-colors duration-200 ease-in-out hover:text-primary">Home</Link>
+              <a href="#how-it-works" className="transition-colors duration-200 ease-in-out hover:text-primary">How It Works</a>
+              <a href="#recent-items" className="transition-colors duration-200 ease-in-out hover:text-primary">Recent Items</a>
+              <a href="#contact" className="transition-colors duration-200 ease-in-out hover:text-primary">Contact</a>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="hidden md:flex items-center gap-3">
                 <SignedIn>
-                  <Button variant="ghost" className="hover:bg-secondary hover:text-foreground font-semibold" onClick={() => navigate("/dashboard")}>
+                  <Button variant="ghost" className="hover:bg-secondary hover:text-primary transition-colors duration-200 ease-in-out font-semibold" onClick={() => navigate("/dashboard")}>
                     My Dashboard
                   </Button>
                   <Button className="font-semibold" onClick={() => navigate("/report")}>
@@ -173,10 +181,10 @@ export default function LandingPage() {
         {isMenuOpen && (
           <div className="md:hidden absolute top-16 left-0 w-full bg-background/98 backdrop-blur-xl border-b border-border py-8 px-4 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-200 z-50">
             <div className="flex flex-col gap-4 text-lg font-medium">
-              <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-foreground border-b border-border pb-2">Home</Link>
-              <a href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-border pb-2">How It Works</a>
-              <a href="#recent-items" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-border pb-2">Recent Items</a>
-              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground border-b border-border pb-2">Contact</a>
+              <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-foreground hover:text-primary transition-colors duration-200 ease-in-out border-b border-border pb-2">Home</Link>
+              <a href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-primary transition-colors duration-200 ease-in-out border-b border-border pb-2">How It Works</a>
+              <a href="#recent-items" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-primary transition-colors duration-200 ease-in-out border-b border-border pb-2">Recent Items</a>
+              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-primary transition-colors duration-200 ease-in-out border-b border-border pb-2">Contact</a>
             </div>
 
             <div className="flex flex-col gap-3 pt-2">
@@ -227,7 +235,7 @@ export default function LandingPage() {
             </Badge>
 
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1]">
-              Find what you've lost on <br className="hidden md:block" /> campus.
+              Find what you've lost on <br className="hidden md:block" /> <span className="text-primary">campus.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl font-light">
@@ -285,7 +293,7 @@ export default function LandingPage() {
         <section id="how-it-works" className="py-20 px-4 max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end w-full justify-between mb-12 gap-4">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight mb-3">How it works</h2>
+              <h2 className="text-3xl font-bold tracking-tight mb-3">How it <span className="text-primary">works</span></h2>
               <p className="text-muted-foreground text-lg max-w-2xl">
                 CampusCrate connects you with your belongings through a secure, community-driven network.
               </p>
@@ -319,7 +327,7 @@ export default function LandingPage() {
         <section id="recent-items" className="py-20 px-4 max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight">Recently Reported</h2>
+              <h2 className="text-3xl font-bold tracking-tight">Recently <span className="text-primary">Reported</span></h2>
               <p className="text-muted-foreground mt-2">Latest items reported by your campus community</p>
             </div>
             <SignedIn>
@@ -401,14 +409,14 @@ export default function LandingPage() {
                       </div>
                       <SignedIn>
                         <Link to={`/item/${item._id}`}>
-                          <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary text-foreground font-semibold">
+                          <Button variant="secondary" className="w-full bg-secondary hover:bg-primary text-foreground hover:text-primary-foreground font-semibold transition-all duration-200 ease-in-out">
                             View Details
                           </Button>
                         </Link>
                       </SignedIn>
                       <SignedOut>
                         <SignInButton mode="modal">
-                          <Button variant="secondary" className="w-full bg-secondary hover:bg-secondary text-foreground font-semibold">
+                          <Button variant="secondary" className="w-full bg-secondary hover:bg-primary text-foreground hover:text-primary-foreground font-semibold transition-all duration-200 ease-in-out">
                             {item.status === "Found" ? "This is mine" : "I found this"}
                           </Button>
                         </SignInButton>
@@ -423,14 +431,14 @@ export default function LandingPage() {
           <div className="flex justify-center">
             <SignedIn>
               <Link to="/dashboard">
-                <Button variant="outline" className="border-border bg-transparent text-foreground hover:bg-secondary rounded-full px-8 gap-2">
+                <Button variant="secondary" className="bg-secondary hover:bg-primary text-foreground hover:text-primary-foreground font-semibold transition-all duration-200 ease-in-out rounded-full px-8 gap-2">
                   View All Items <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <Button variant="outline" className="border-border bg-transparent text-foreground hover:bg-secondary rounded-full px-8 gap-2">
+                <Button variant="secondary" className="bg-secondary hover:bg-primary text-foreground hover:text-primary-foreground font-semibold transition-all duration-200 ease-in-out rounded-full px-8 gap-2">
                   Sign In to View All <ArrowRight className="h-4 w-4" />
                 </Button>
               </SignInButton>
@@ -472,56 +480,70 @@ export default function LandingPage() {
       </main>
 
       {/* Footer / Contact */}
-      <footer id="contact" className="border-t border-border py-16 px-4 bg-background">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 mb-16">
+      <footer id="contact" className="pt-16 pb-12 px-4 bg-[#212331] text-white">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <Box className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold tracking-tight text-foreground">CampusCrate</span>
+              <span className="text-lg font-bold tracking-tight text-white">Campus<span className="text-primary">Crate</span></span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs font-medium">
+            <p className="text-sm text-gray-300 leading-relaxed max-w-xs font-medium">
               Helping students reconnect with their belongings since 2026. Verified by University Administration.
             </p>
           </div>
 
           <div>
-            <h4 className="font-bold mb-4 text-foreground">Platform</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground font-medium">
-              <li><a href="#recent-items" className="hover:text-foreground transition-colors">Browse Items</a></li>
+            <h4 className="font-bold mb-4 text-white">Platform</h4>
+            <ul className="space-y-3 text-sm text-gray-300 font-medium">
+              <li><a href="#recent-items" className="hover:text-primary transition-colors duration-200 ease-in-out">Browse Items</a></li>
               <SignedIn>
-                <li><Link to="/report" className="hover:text-foreground transition-colors">Report Lost Item</Link></li>
-                <li><Link to="/dashboard" className="hover:text-foreground transition-colors">My Dashboard</Link></li>
+                <li><Link to="/report" className="hover:text-primary transition-colors duration-200 ease-in-out">Report Lost Item</Link></li>
+                <li><Link to="/dashboard" className="hover:text-primary transition-colors duration-200 ease-in-out">My Dashboard</Link></li>
               </SignedIn>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold mb-4 text-foreground">Help</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground font-medium">
-              <li><a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a></li>
-              <li><a href="#contact" className="hover:text-foreground transition-colors">Contact Us</a></li>
+            <h4 className="font-bold mb-4 text-white">Help</h4>
+            <ul className="space-y-3 text-sm text-gray-300 font-medium">
+              <li><a href="#how-it-works" className="hover:text-primary transition-colors duration-200 ease-in-out">How It Works</a></li>
+              <li><a href="#contact" className="hover:text-primary transition-colors duration-200 ease-in-out">Contact Us</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold mb-4 text-foreground">Contact</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground font-medium">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" />  registrarsbssu@gmail.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" /> 0187-4292879</li>
-              <li className="flex items-start gap-2"><Building className="h-4 w-4 shrink-0 mt-0.5" /> <span>Sardar Beant Singh State University, National Highway 15, Gurdaspur, Punjab 143530</span></li>
+            <h4 className="font-bold mb-4 text-white">Contact</h4>
+            <ul className="space-y-3 text-sm text-gray-300 font-medium">
+              <li>
+                <a href="mailto:registrarsbssu@gmail.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-colors duration-200 ease-in-out hover:text-primary cursor-pointer">
+                  <Mail className="h-4 w-4 shrink-0" /> registrarsbssu@gmail.com
+                </a>
+              </li>
+              <li>
+                <a href="tel:01874292879" onClick={(e) => handlePhoneClick(e, "0187-4292879")} className="flex items-center gap-2 transition-colors duration-200 ease-in-out hover:text-primary cursor-pointer" title="Click to call and copy">
+                  <Phone className="h-4 w-4 shrink-0" /> 0187-4292879
+                </a>
+              </li>
+              <li>
+                <a href="https://maps.app.goo.gl/6swsR5Zy6DYvEi797" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 transition-colors duration-200 ease-in-out hover:text-primary cursor-pointer">
+                  <Building className="h-4 w-4 shrink-0 mt-0.5" /> <span>Sardar Beant Singh State University, National Highway 15, Gurdaspur, Punjab 143530</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
+      </footer>
 
-        <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-muted-foreground">
-          <p>© {new Date().getFullYear()} CampusCrate. All rights reserved.</p>
+      <div className="bg-[#2B2D3B] py-6 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-white">
+          <p>© {new Date().getFullYear()} Campus<span className="text-primary">Crate</span>. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link to="/admin/login" className="flex items-center gap-1.5 text-rose-500/60 hover:text-rose-400 transition-colors font-semibold">
+            <Link to="/admin/login" className="flex items-center gap-1.5 text-rose-400 hover:text-primary transition-colors duration-200 ease-in-out font-semibold">
               <ShieldCheck className="h-3.5 w-3.5" /> Admin Console
             </Link>
           </div>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
