@@ -95,7 +95,7 @@ export default function Navbar() {
     if (socket) {
       socket.emit("join_user", dbUser._id);
       
-      socket.on("receive_message", (message) => {
+      socket.on("new_message", (message) => {
           // Re-fetch the global unread count to ensure "unique conversation" logic
           if (message.receiver === dbUser?._id || message.receiver?._id === dbUser?._id) {
               loadUnreadCount();
@@ -114,7 +114,7 @@ export default function Navbar() {
 
     return () => {
         if (socket) {
-            socket.off("receive_message");
+            socket.off("new_message");
             socket.off("new_notification");
         }
     };
