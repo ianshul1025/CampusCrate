@@ -236,7 +236,7 @@ It provides a **centralized, searchable, and real-time platform**, replacing uns
 ```
 ---
 
-## 🧑‍💻 React Pages:
+## 🧑‍💻 React Pages
 
 * `/` → Landing Page
 * `/dashboard` → Main feed (lost & found items)
@@ -385,11 +385,28 @@ Base URL: `/api/v1`
 ## ⚙️ Setup Instructions
 
 ### 1. Clone Repository
+```bash
 git clone https://github.com/ianshul1025/CampusCrate.git
+cd CampusCrate
+```
 
 ### 2. Install Dependencies
-cd frontend && npm install  
-cd ../backend && npm install  
+```bash
+cd frontend
+npm install
+
+cd ../backend
+npm install
+```
+
+### 3. Run Project
+```bash
+# backend
+npm run dev
+
+# frontend
+npm run dev
+``` 
 
 ### 3. Environment Variables (.env)
 
