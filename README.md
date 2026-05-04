@@ -49,7 +49,7 @@ It provides a **centralized, searchable, and real-time platform**, replacing uns
 
 ---
 
-## 🔁 Work Flow
+## 🔁 User Flow
 
 ### 🧍‍♂️ 1. Lost Item Flow (User)
 
@@ -265,19 +265,12 @@ It provides a **centralized, searchable, and real-time platform**, replacing uns
 
 * **REST APIs (Core):**
 
-  * `POST /api/v1/auth/sync` → Sync user with database  
-  * `POST /api/v1/auth/complete-profile` → Complete user profile  
+  - Auth → `/api/v1/auth/*`
+  - Items → `/api/v1/items/*`
+  - Claims → `/api/v1/claims/*`
+  - Messages → `/api/v1/messages/*`
 
-  * `GET /api/v1/items` → Get all items  
-  * `POST /api/v1/items` → Create item  
-  * `PATCH /api/v1/items/:id` → Update item  
-  * `PATCH /api/v1/items/:id/returned` → Mark item as returned  
-
-  * `POST /api/v1/claims/:itemId` → Create claim  
-  * `PATCH /api/v1/claims/:claimId/verify` → Approve/reject claim  
-
-  * `POST /api/v1/messages/:itemId` → Send message  
-  * `GET /api/v1/messages/:itemId` → Get messages  
+  (Detailed endpoints listed below)  
 
 ---
 
@@ -382,3 +375,42 @@ Base URL: `/api/v1`
 | PATCH | `/admin/reports/:reportId/status` | Update report status |
 
 ---
+
+## 🌐 Live Demo
+
+🔗 https://campuscrate.vercel.app/
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone Repository
+git clone https://github.com/ianshul1025/CampusCrate.git
+
+### 2. Install Dependencies
+cd frontend && npm install  
+cd ../backend && npm install  
+
+### 3. Environment Variables (.env)
+
+PORT=5000  
+MONGODB_URI=your_mongo_uri  
+JWT_SECRET=your_secret  
+
+CLERK_SECRET_KEY=your_key  
+CLERK_PUBLISHABLE_KEY=your_key  
+
+IMAGEKIT_PUBLIC_KEY=your_key  
+IMAGEKIT_PRIVATE_KEY=your_key  
+
+VAPID_PUBLIC_KEY=your_key  
+VAPID_PRIVATE_KEY=your_key  
+
+### 4. Run Project
+npm run dev
+
+---
+
+## 📊 Summary
+
+CampusCrate is a real-time MERN-based platform that enables structured lost & found management with authentication, claim verification, and messaging.
