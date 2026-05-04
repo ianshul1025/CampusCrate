@@ -401,12 +401,14 @@ npm install
 
 ### 3. Run Project
 ```bash
-# backend
+# start backend
+cd backend
 npm run dev
 
-# frontend
+# start frontend (new terminal)
+cd frontend
 npm run dev
-``` 
+```
 
 ### 3. Environment Variables (.env)
 
